@@ -64,8 +64,6 @@ void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, i
 				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED);
 			}
 		}
-		IMG_Init( IMG_INIT_PNG );
-		IMG_Init( IMG_INIT_JPG );
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 		SDL_SetRenderDrawBlendMode(mainWindowRenderer,SDL_BLENDMODE_BLEND);
 		#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX

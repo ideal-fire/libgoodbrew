@@ -23,5 +23,5 @@ void setWindowTitle(char* _newTitle);
 void startDrawingBottom();
 void startDrawing();
 void FixCoords(int* _x, int* _y);
- 
+void initImages();
 #endif // GOODBREWGRAPHICSINCLUDED_H

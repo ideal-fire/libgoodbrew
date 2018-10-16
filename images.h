@@ -27,9 +27,9 @@ void drawTexture(const crossTexture passedTexture, int _destX, int _destY);
 void freeTexture(crossTexture passedTexture);
 int getTextureHeight(const crossTexture passedTexture);
 int getTextureWidth(const crossTexture passedTexture);
-crossTexture loadJPGBuffer(const void* _passedBuffer, int _passedBufferSize);
+crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadJPG(const char* path);
-crossTexture loadPNGBuffer(const void* _passedBuffer, int _passedBufferSize);
+crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadPNG(const char* path);
  
 #endif /* GOODBREWIMAGESINCLUDED_H */

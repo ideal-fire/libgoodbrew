@@ -14,9 +14,11 @@ int main(int argc, char const *argv[]){
 	int _realWidth;
 	int _realHeight;
 	initGraphics(640,480,&_realWidth,&_realHeight);
+	initImages();
 	setWindowTitle("Test happy");
 
 	crossTexture mytex = loadPNG("./test.png");
+	
 
 	if (mytex==NULL){
 		printf("oh\n");

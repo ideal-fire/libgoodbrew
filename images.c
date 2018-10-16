@@ -20,6 +20,10 @@
 	== IMAGES
 	=================================================
 	*/
+	void initImages(){
+		IMG_Init( IMG_INIT_PNG );
+		IMG_Init( IMG_INIT_JPG );
+	}
 	#if GBREND == GBREND_SDL
 		crossTexture surfaceToTexture(SDL_Surface* _tempSurface){
 			SDL_Texture* _returnTexture = SDL_CreateTextureFromSurface( mainWindowRenderer, _tempSurface );
@@ -27,46 +31,46 @@
 			return _returnTexture;
 		}
 	#endif
-	crossTexture loadPNGBuffer(const void* _passedBuffer, int _passedBufferSize){
-		#if GPREND == GBREND_VITA2D
+	crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
+		#if GBREND == GBREND_VITA2D
 			return vita2d_load_PNG_buffer(_passedBuffer);
-		#elif GPREND == GBREND_SDL
+		#elif GBREND == GBREND_SDL
 			SDL_RWops* _passedBufferRW = SDL_RWFromMem(_passedBuffer, _passedBufferSize);
 			SDL_Surface* _tempSurface = IMG_LoadPNG_RW(_passedBufferRW);
 			SDL_RWclose(_passedBufferRW);
 			return surfaceToTexture(_tempSurface);
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			return sfil_load_PNG_buffer(_passedBuffer,SF2D_PLACE_RAM);
 		#endif
 	}
-	crossTexture loadJPGBuffer(const void* _passedBuffer, int _passedBufferSize){
-		#if GPREND == GBREND_VITA2D
+	crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
+		#if GBREND == GBREND_VITA2D
 			return vita2d_load_JPEG_buffer(_passedBuffer,_passedBufferSize);
-		#elif GPREND == GBREND_SDL
+		#elif GBREND == GBREND_SDL
 			SDL_RWops* _passedBufferRW = SDL_RWFromMem(_passedBuffer, _passedBufferSize);
 			SDL_Surface* _tempSurface = IMG_LoadJPG_RW(_passedBufferRW);
 			SDL_RWclose(_passedBufferRW);
 			return surfaceToTexture(_tempSurface);
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			return sfil_load_JPEG_buffer(_passedBuffer,_passedBufferSize,SF2D_PLACE_RAM);
 		#endif
 	}
 	crossTexture loadPNG(const char* path){
-		#if GPREND == GBREND_VITA2D
+		#if GBREND == GBREND_VITA2D
 			return vita2d_load_PNG_file(path);
-		#elif GPREND == GBREND_SDL
+		#elif GBREND == GBREND_SDL
 			SDL_Surface* _tempSurface = IMG_Load(path);
 			return surfaceToTexture(_tempSurface);
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
 		#endif
 	}
 	crossTexture loadJPG(const char* path){
-		#if GPREND == GBREND_VITA2D
+		#if GBREND == GBREND_VITA2D
 			return vita2d_load_JPEG_file(path);
-		#elif GPREND == GBREND_SDL
+		#elif GBREND == GBREND_SDL
 			return loadPNG(path);
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
 		#endif
 	}
@@ -155,7 +159,7 @@
 			_destRect.y=destY;
 	
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			sf2d_draw_texture_part_scale(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale);
 		#endif
 	}
@@ -221,7 +225,7 @@
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 			SDL_SetTextureColorMod(passedTexture, oldr, oldg, oldb);
 			SDL_SetTextureAlphaMod(passedTexture, olda);
-		#elif GPREND == GBREND_SF2D
+		#elif GBREND == GBREND_SF2D
 			sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale, RGBA8(r,g,b,a));
 		#endif
 	}
