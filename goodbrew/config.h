@@ -56,6 +56,6 @@
 	#define GBSND GBSND_3DS
 #elif GBPLAT == GB_SWITCH
 	#define GBREND GBREND_SDL
-	#define GBTXT GBTXT_NONE
+	#define GBTXT GBTXT_FONTCACHE
 	#define GBSND GBSND_NONE
 #endif

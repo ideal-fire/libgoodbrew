@@ -6,4 +6,6 @@ gcc -g -Igoodbrew -c base.c -o base.o
 gcc -g -Igoodbrew -c graphics.c -o graphics.o
 gcc -g -Igoodbrew -c images.c -o images.o
 gcc -g -Igoodbrew -c paths.c -o paths.o
-ar rcs libgoodbrew.a base.o graphics.o images.o paths.o
+gcc -g -Igoodbrew -c useful.c -o useful.o
+gcc -g -Igoodbrew -c text.c -o text.o
+ar rcs libgoodbrew.a base.o graphics.o images.o paths.o useful.o text.o
