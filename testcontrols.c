@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "goodbrew/config.h"
-#include "base.h"
-#include "graphics.h"
-#include "controls.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
+#include <goodbrew/graphics.h>
+#include <goodbrew/controls.h>
 
 void XOutFunction(){
 	exit(0);

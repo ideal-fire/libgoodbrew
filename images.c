@@ -1,8 +1,8 @@
 #ifndef GENERALGOODIMAGESHEADER
 #define GENERALGOODIMAGESHEADER
-	#include "goodbrew/config.h"
-	#include "graphics.h"
-	#include "images.h"
+	#include <goodbrew/config.h>
+	#include <goodbrew/graphics.h>
+	#include <goodbrew/images.h>
 	#include <stdio.h>
 	#if GBREND == GBREND_SDL
 		extern SDL_Window* mainWindow;

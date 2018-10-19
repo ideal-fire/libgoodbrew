@@ -1,7 +1,7 @@
 #include <stdarg.h>
-#include "goodbrew/config.h"
-#include "text.h"
-#include "useful.h"
+#include <goodbrew/config.h>
+#include <goodbrew/text.h>
+#include <goodbrew/useful.h>
 
 // TODO - Should multiple fonts at once be supported? If so, I need to store the bitmap font info in a struct that's in the crossFont variable
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "goodbrew/config.h"
+#include <goodbrew/config.h>
 
 char* formatf(va_list _startedList, const char* _stringFormat){
 	va_list _doWriteArgs;

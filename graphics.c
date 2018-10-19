@@ -1,5 +1,5 @@
-#include "goodbrew/config.h"
-#include "graphics.h"
+#include <goodbrew/config.h>
+#include <goodbrew/graphics.h>
 
 #if DOFIXCOORDS == 1
 	void FixCoords(int* _x, int* _y){

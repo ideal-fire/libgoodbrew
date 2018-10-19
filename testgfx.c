@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "goodbrew/config.h"
-#include "base.h"
-#include "graphics.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
+#include <goodbrew/graphics.h>
 
 
 int main(int argc, char const *argv[]){

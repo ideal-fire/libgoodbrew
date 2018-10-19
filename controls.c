@@ -1,5 +1,5 @@
-#include "goodbrew/config.h"
-#include "controls.h"
+#include <goodbrew/config.h>
+#include <goodbrew/controls.h>
 
 int touchX=-1;
 int touchY=-1;

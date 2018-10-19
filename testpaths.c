@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "goodbrew/config.h"
-#include "base.h"
-#include "paths.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
+#include <goodbrew/paths.h>
 
 int main(int argc, char const *argv[]){
 	generalGoodInit();

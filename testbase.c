@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "goodbrew/config.h"
-#include "base.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
 
 
 int main(int argc, char const *argv[]){

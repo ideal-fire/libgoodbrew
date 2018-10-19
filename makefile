@@ -2,7 +2,7 @@ src = base.c graphics.c images.c paths.c useful.c text.c controls.c
 obj = $(src:.c=.o)
 
 LDFLAGS = 
-CFLAGS = -g
+CFLAGS = -g -I.
 OUTNAME = libgoodbrew.a
 
 $(OUTNAME): $(obj)

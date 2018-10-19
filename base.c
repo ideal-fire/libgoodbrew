@@ -6,8 +6,8 @@
 #include <time.h>
 #include <stdint.h>
 
-#include "goodbrew/config.h"
-#include "base.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
 
 #if GBPLAT == GB_WINDOWS
 	#include <windows.h>

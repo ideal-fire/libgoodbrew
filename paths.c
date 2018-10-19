@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "goodbrew/config.h"
-#include "base.h"
-#include "paths.h"
+#include <goodbrew/config.h>
+#include <goodbrew/base.h>
+#include <goodbrew/paths.h>
 
 char* dataFolder=NULL;
 
