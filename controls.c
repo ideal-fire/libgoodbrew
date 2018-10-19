@@ -18,7 +18,7 @@ char buttonAlias[NUMBUTTONS];
 #elif GBREND == GBREND_SDL
 	#include <SDL2/SDL.h>
 	#include <SDL2/SDL_keycode.h>
-	#include "graphics.h" // For screen width and height
+	#include <goodbrew/graphics.h> // For screen width and height
 	SDL_Keycode lastSDLPressedKey=SDLK_UNKNOWN;
 	extern void XOutFunction();
 	char lastClickWasRight;

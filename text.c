@@ -10,7 +10,7 @@
 	extern SDL_Renderer* mainWindowRenderer;
 	#include "SDL_FontCache.h"
 #endif
-#include "graphics.h"
+#include <goodbrew/graphics.h>
 
 #if GBTXT == GBTXT_BITMAP
 	typedef struct{
