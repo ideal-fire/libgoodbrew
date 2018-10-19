@@ -1,6 +1,6 @@
 #ifndef GENERALGOODIMAGESHEADER
 #define GENERALGOODIMAGESHEADER
-	#include "config.h"
+	#include "goodbrew/config.h"
 	#include "graphics.h"
 	#include "images.h"
 	#include <stdio.h>

@@ -1,5 +1,5 @@
 #include <stdarg.h>
-#include "config.h"
+#include "goodbrew/config.h"
 #include "text.h"
 #include "useful.h"
 

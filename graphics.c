@@ -1,4 +1,4 @@
-#include "config.h"
+#include "goodbrew/config.h"
 #include "graphics.h"
 
 #if DOFIXCOORDS == 1

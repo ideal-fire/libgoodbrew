@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "goodbrew/config.h"
+
 char* formatf(va_list _startedList, const char* _stringFormat){
 	va_list _doWriteArgs;
 	char* _completeString;
@@ -19,3 +21,10 @@ char* easySprintf( const char* _stringFormat, ... ) {
 	char* _completeString = formatf(_tempArgs,_stringFormat);
 	return _completeString;
 }
+
+#if GBPLAT == GB_ANDROID
+	// itoa replacement for android which only supports base 10
+	void itoa(int _num, char* _buffer, int _uselessBase){
+		sprintf(_buffer, "%d", _num);
+	}
+#endif

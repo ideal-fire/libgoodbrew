@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "config.h"
+#include "goodbrew/config.h"
 #include "base.h"
 #include "paths.h"
 
