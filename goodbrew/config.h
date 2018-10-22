@@ -59,3 +59,7 @@
 	#define GBTXT GBTXT_FONTCACHE
 	#define GBSND GBSND_NONE
 #endif
+
+// Define these manually in your code anywhere
+extern char* vitaAppId;
+extern char* androidPackageName;

@@ -5,7 +5,7 @@
 //https://pastebin.com/raw/SP4tpNga
 
 // If this is libGeneralGood
-#if PLATFORM
+#if GBPLAT
 	#define INCLUDETESTCODE 0
 #else
 	#define INCLUDETESTCODE 1
@@ -248,7 +248,7 @@ int oggSeekCallback(void *datasource, ogg_int64_t offset, int whence){
 	}
 	return 0;
 }
-long mpgReadCallback(void* _passedData, void* _passedBuffer, size_t _passedBytes){
+ssize_t mpgReadCallback(void* _passedData, void* _passedBuffer, size_t _passedBytes){
 	return oggReadCallback(_passedBuffer,1,_passedBytes,_passedData);
 }
 void mpgCloseCallback(void* _passedData){

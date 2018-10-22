@@ -40,7 +40,10 @@ enum corssFileSeekPoint{
 		int internalPosition;
 		FILE* fp;
 	}vitaFile;
-	typedef vitaFile crossFile;
+	typedef vitaFile* crossFile;
+
+	#include <psp2/types.h>
+	#include <dirent.h>
 #elif GBREND == GBREND_SDL
 	typedef SDL_RWops* crossFile;
 #else

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <goodbrew/config.h>
 #include <goodbrew/base.h>
 #include <goodbrew/paths.h>
@@ -8,9 +10,9 @@ char* dataFolder=NULL;
 // Passed string should be freed already
 void generateDefaultDataDirectory(char** _dataDirPointer){
 	#if GBPLAT == GB_ANDROID
-		*_dataDirPointer = malloc(strlen("/data/data//")+strlen(ANDROIDPACKAGENAME)+1);
+		*_dataDirPointer = malloc(strlen("/data/data//")+strlen(androidPackageName)+1);
 		strcpy(*_dataDirPointer,"/data/data/");
-		strcat(*_dataDirPointer,ANDROIDPACKAGENAME);
+		strcat(*_dataDirPointer,androidPackageName);
 		strcat(*_dataDirPointer,"/");
 	#elif GBPLAT == GB_LINUX
 		*_dataDirPointer = malloc(strlen("./")+1);
@@ -32,26 +34,26 @@ void generateDefaultDataDirectory(char** _dataDirPointer){
 		*_dataDirPointer = strdup(_buffer);
 	#elif GBPLAT == GB_VITA
 		// Use uma0 data directory if it exists, otherwise fallback on ux0
-		*_dataDirPointer = malloc(strlen("uma0:data//")+strlen(VITAAPPID)+1);
+		*_dataDirPointer = malloc(strlen("uma0:data//")+strlen(vitaAppId)+1);
 		strcpy(*_dataDirPointer,"uma0:data/");
-		strcat(*_dataDirPointer,VITAAPPID);
+		strcat(*_dataDirPointer,vitaAppId);
 		strcat(*_dataDirPointer,"/");
 		if (!directoryExists(*_dataDirPointer)){
 			free(*_dataDirPointer);
-			*_dataDirPointer = malloc(strlen("ux0:data//")+strlen(VITAAPPID)+1);
+			*_dataDirPointer = malloc(strlen("ux0:data//")+strlen(vitaAppId)+1);
 			strcpy(*_dataDirPointer,"ux0:data/");
-			strcat(*_dataDirPointer,VITAAPPID);
+			strcat(*_dataDirPointer,vitaAppId);
 			strcat(*_dataDirPointer,"/");
 		}
 	#elif GBPLAT == GB_3DS
-		*_dataDirPointer = malloc(strlen("/3ds/data/")+strlen(VITAAPPID)+2);
+		*_dataDirPointer = malloc(strlen("/3ds/data/")+strlen(vitaAppId)+2);
 		strcpy(*_dataDirPointer,"/3ds/data/");
-		strcat(*_dataDirPointer,VITAAPPID);
+		strcat(*_dataDirPointer,vitaAppId);
 		strcat(*_dataDirPointer,"/");
 	#elif GBPLAT == GB_SWITCH
-		*_dataDirPointer = malloc(strlen("/switch/")+strlen(VITAAPPID)+2);
+		*_dataDirPointer = malloc(strlen("/switch/")+strlen(vitaAppId)+2);
 		strcpy(*_dataDirPointer,"/switch/");
-		strcat(*_dataDirPointer,VITAAPPID);
+		strcat(*_dataDirPointer,vitaAppId);
 		strcat(*_dataDirPointer,"/");
 	#endif
 }

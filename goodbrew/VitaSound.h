@@ -2,6 +2,7 @@
 #define LIBGOODBREWVITASOUNDINCLUDED_H
 #include <samplerate.h>
 #include <psp2/kernel/threadmgr.h>
+#include <stdio.h>
 
 typedef struct{
 	void* mainAudioStruct; // malloc'd and needs a free function

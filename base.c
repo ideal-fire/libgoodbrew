@@ -20,6 +20,11 @@
 	// For mkdir
 	#include <sys/stat.h>
 #endif
+#if GBPLAT == GB_VITA
+	#include <psp2/kernel/threadmgr.h>
+	#include <psp2/kernel/processmgr.h>
+	#include <psp2/io/fcntl.h>
+#endif
 #if GBPLAT == GB_3DS
 	FS_Archive _sdArchive=0;
 #endif
@@ -39,7 +44,7 @@ void generalGoodQuit(){
 }
 // Waits for a number of miliseconds.
 void wait(int miliseconds){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		sceKernelDelayThread(miliseconds*1000);
 	#elif GBREND == GBREND_SDL
 		SDL_Delay(miliseconds);
@@ -56,7 +61,7 @@ void wait(int miliseconds){
 }
 
 u64 getMilli(){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		return  (sceKernelGetProcessTimeWide() / 1000);
 	#elif GBREND == GBREND_SDL
 		return SDL_GetTicks();
@@ -103,7 +108,7 @@ signed char checkFileExist(const char* location){
 	#endif
 }
 void createDirectory(const char* path){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		sceIoMkdir(path,0777);
 	#elif GBPLAT == GB_WINDOWS
 		mkdir(path);
@@ -130,7 +135,7 @@ char dirOpenWorked(crossDir passedir){
 		if (passedir==NULL){
 			return 0;
 		}
-	#elif GBPLAT == PLAT_VITA
+	#elif GBPLAT == GB_VITA
 		if (passedir<0){
 			return 0;
 		}
@@ -146,7 +151,7 @@ char dirOpenWorked(crossDir passedir){
 crossDir openDirectory(const char* filepath){
 	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 		return opendir(filepath);
-	#elif GBPLAT == PLAT_VITA
+	#elif GBPLAT == GB_VITA
 		return (sceIoDopen(filepath));
 	#elif GBPLAT == GB_3DS
 		// Should not end in slash
@@ -168,7 +173,7 @@ crossDir openDirectory(const char* filepath){
 char* getDirectoryResultName(crossDirStorage* passedStorage){
 	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 		return ((*passedStorage)->d_name);
-	#elif GBPLAT == PLAT_VITA
+	#elif GBPLAT == GB_VITA
 		//WriteToDebugFile
 		return ((passedStorage)->d_name);
 	#elif GBPLAT == GB_3DS
@@ -231,11 +236,11 @@ char directoryExists(const char* filepath){
 == CROSS PLATFORM FILE WRITING AND READING
 ==========================================================
 */
-#if GBPLAT == PLAT_VITA
-	void _fixVitaFile(vitaFile _passedFile){
-		fclose(_passedFile.fp);
-		_passedFile.fp = fopen(_passedFile.filename,"rb");
-		fseek(_passedFile.fp,_passedFile.internalPosition,SEEK_SET);
+#if GBPLAT == GB_VITA
+	void _fixVitaFile(vitaFile* _passedFile){
+		fclose(_passedFile->fp);
+		_passedFile->fp = fopen(_passedFile->filename,"rb");
+		fseek(_passedFile->fp,_passedFile->internalPosition,SEEK_SET);
 	}
 #endif
 // Removes all 0x0D and 0x0A from last two characters of string by moving null character.
@@ -254,13 +259,13 @@ void removeNewline(char* _toRemove){
 }
 // Returns number of elements read
 size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){
-	#if GBPLAT == PLAT_VITA
-		size_t _readElements = fread(buffer,size,count,stream.fp);
-		if (_readElements==0 && count!=0 && feof(stream.fp)==0){
+	#if GBPLAT == GB_VITA
+		size_t _readElements = fread(buffer,size,count,stream->fp);
+		if (_readElements==0 && count!=0 && feof(stream->fp)==0){
 			_fixVitaFile(stream);
 			return crossfread(buffer,size,count,stream);
 		}
-		stream.internalPosition += size*_readElements;
+		stream->internalPosition += size*_readElements;
 		return _readElements;
 	#elif GBREND == GBREND_SDL
 		return SDL_RWread(stream,buffer,size,count);
@@ -269,7 +274,7 @@ size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){
 	#endif
 }
 crossFile crossfopen(const char* filename, const char* mode){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		vitaFile* _returnFile = malloc(sizeof(vitaFile));
 		_returnFile->fp=fopen(filename,mode);
 		_returnFile->filename = malloc(strlen(filename)+1);
@@ -285,9 +290,9 @@ crossFile crossfopen(const char* filename, const char* mode){
 // Returns 0 on success.
 // Returns negative number of failure
 int crossfclose(crossFile stream){
-	#if GBPLAT == PLAT_VITA
-		fclose(stream.fp);
-		free(stream.filename);
+	#if GBPLAT == GB_VITA
+		fclose(stream->fp);
+		free(stream->filename);
 		return 0;
 	#elif GBREND == GBREND_SDL
 		return SDL_RWclose(stream);
@@ -319,15 +324,15 @@ int crossfseek(crossFile stream, long int offset, int origin){
 		#endif
 	}
 
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		int _seekReturnValue;
-		_seekReturnValue = fseek(stream.fp,offset,_trueOrigin);
+		_seekReturnValue = fseek(stream->fp,offset,_trueOrigin);
 		// If seek failed but it shouldn't have because we're not at the end of the file yet.
-		if (_seekReturnValue!=0 && feof(stream.fp)==0){
+		if (_seekReturnValue!=0 && feof(stream->fp)==0){
 			_fixVitaFile(stream);
 			return crossfseek(stream,offset,_trueOrigin);
 		}else{
-			stream.internalPosition = ftell(stream.fp);
+			stream->internalPosition = ftell(stream->fp);
 		}
 		return 0;
 	#elif GBREND == GBREND_SDL
@@ -344,7 +349,7 @@ int crossungetc(int c, crossFile stream){
 	return EOF;
 }
 long int crossftell(crossFile fp){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		return fp->internalPosition;
 	#elif GBREND == GBREND_SDL
 		return SDL_RWseek(fp,0,RW_SEEK_CUR);
@@ -361,7 +366,7 @@ int crossgetc(crossFile fp){
 	return _readChar;
 }
 char crossfeof(crossFile fp){
-	#if GBPLAT == PLAT_VITA
+	#if GBPLAT == GB_VITA
 		return feof(fp->fp);
 	#elif GBREND == GBREND_SDL
 		if (crossgetc(fp)==EOF){

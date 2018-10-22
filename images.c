@@ -8,13 +8,14 @@
 		extern SDL_Window* mainWindow;
 		extern SDL_Renderer* mainWindowRenderer;
 		#include <SDL2/SDL_image.h>	
-	#endif
-	#if GBREND == GBREND_SF2D
+	#elif GBREND == GBREND_SF2D
 		#include <3ds.h>
 		#include <sfil.h>
 		#include <3ds/svc.h>
 
 		#warning no good support for sf2d yet
+	#elif GBREND == GBREND_VITA2D
+		#include <psp2/display.h>
 	#endif
 	
 	/*
@@ -23,8 +24,10 @@
 	=================================================
 	*/
 	void initImages(){
-		IMG_Init( IMG_INIT_PNG );
-		IMG_Init( IMG_INIT_JPG );
+		#if GBREND == GBREND_SDL
+			IMG_Init( IMG_INIT_PNG );
+			IMG_Init( IMG_INIT_JPG );
+		#endif
 	}
 	#if GBREND == GBREND_SDL
 		crossTexture surfaceToTexture(SDL_Surface* _tempSurface){

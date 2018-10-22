@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdlib.h>
 #include <goodbrew/config.h>
 #include <goodbrew/text.h>
 #include <goodbrew/useful.h>
@@ -129,7 +130,7 @@ int textWidth(crossFont _passedFont, const char* message, double _passedSize){
 void gbDrawTextAlpha(crossFont _passedFont, int x, int y, const char* text, double _passedSize, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	EASYFIXCOORDS(&x,&y);
 	#if GBTXT == GBTXT_VITA2D
-		vita2d_font_draw_text(_passedFont,x,y+textHeight(_passedSize), RGBA8(r,g,b,a),floor(_passedSize),text);
+		vita2d_font_draw_text(_passedFont,x,y+textHeight(_passedFont,_passedSize), RGBA8(r,g,b,a),_passedSize,text);
 	#elif GBTXT == GBTXT_BITMAP
 		int i=0;
 		int _currentDrawTextX=x;

@@ -6,7 +6,7 @@
 	typedef SDL_Texture* crossTexture;
 #endif
 #if GBREND == GBREND_VITA2D
-	#include <vita2d.h>
+	#include <libvita2dplusbloat/vita2d.h>
 	typedef vita2d_texture* crossTexture;
 #endif
 #if GBREND == GBREND_SF2D

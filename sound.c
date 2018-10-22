@@ -215,7 +215,7 @@ crossPlayHandle playMusic(crossMusic toPlay, unsigned char _passedChannel){
 		nathanPlayMusic(toPlay,_passedChannel);
 		return toPlay->_musicChannel;
 	#elif GBSND == GBSND_VITA
-		return playSound(toPlay,1,_passedChannel);
+		return playSound(toPlay,_passedChannel);
 	#elif GBSND == SND_NONE
 		return 1;
 	#endif

@@ -15,19 +15,19 @@
 	typedef void* crossPlayHandle;
 #elif GBSND == GBSND_SOLOUD
 	#include <soloud_c.h>
-	typedef WavStream crossMusic;
-	typedef Wav crossSE;
+	typedef WavStream* crossMusic;
+	typedef Wav* crossSE;
 	typedef unsigned int crossPlayHandle;
 #elif GBSND == GBSND_3DS
 	#include "3dsSound.h"
-	typedef crossMusic NathanMusic;
-	typedef crossSE NathanMusic;
+	typedef NathanMusic* crossMusic;
+	typedef NathanMusic* crossSE;
 	typedef unsigned char crossPlayHandle;
 #elif GBSND == GBSND_VITA
 	#include "VitaSound.h"
-	typedef NathanAudio crossMusic;
+	typedef NathanAudio* crossMusic;
 	typedef crossMusic crossSE;
-	typedef crossMusic* crossPlayHandle;
+	typedef crossMusic crossPlayHandle;
 #elif GBSND == GBSND_NONE
 	typedef int crossSE;
 	typedef int crossMusic;
