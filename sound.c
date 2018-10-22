@@ -13,6 +13,7 @@ char oggSupported(){
 	return (GBSND==GBSND_SDL || GBSND==GBSND_SOLOUD || GBSND==GBSND_3DS || GBSND==GBSND_VITA);
 }
 
+// Returns not 0 if didn't work
 char initAudio(){
 	#if GBSND == GBSND_SDL
 		SDL_Init( SDL_INIT_AUDIO );
@@ -22,25 +23,25 @@ char initAudio(){
 		#else
 			Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 2048 );
 		#endif
-		return 1;
+		return 0;
 	#elif GBSND == GBSND_SOLOUD
 		mySoLoudEngine = Soloud_create();
 		Soloud_init(mySoLoudEngine);
-		return 1;
+		return 0;
 	#elif GBSND == GBSND_3DS
 		if (nathanInit3dsSound()==0){
-			return 0;
+			return 1;
 		}
 		int i;
 		for (i=0;i<=20;i++){
 			nathanInit3dsChannel(i);
 		}
-		return 1;
+		return 0;
 	#elif GBSND == GBSND_VITA
 		// Not needed?
-		return 1;
-	#else
 		return 0;
+	#else
+		return 1;
 	#endif
 }
 void quitAudio(){

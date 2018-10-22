@@ -13,6 +13,8 @@
 		#include <3ds.h>
 		#include <sfil.h>
 		#include <3ds/svc.h>
+
+		#warning no good support for sf2d yet
 	#endif
 	
 	/*
@@ -135,39 +137,37 @@
 		
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture(passedTexture,_destX,_destY);
+			//sf2d_draw_texture(passedTexture,_destX,_destY);
 		#endif
 	}
 
-	void drawTexturePartScale(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, double texXScale, double texYScale){
+	void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, int destW, int destH){
 		EASYFIXCOORDS(&destX,&destY);
 		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_part_scale(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale);
+			vita2d_draw_texture_part_sized(passedTexture,destX,destY,texX,texY,texW, texH, destW, destH);
 		#elif GBREND == GBREND_SDL
 			SDL_Rect _srcRect;
 			SDL_Rect _destRect;
 			_srcRect.w=texW;
 			_srcRect.h=texH;
-			
 			_srcRect.x=texX;
 			_srcRect.y=texY;
 		
-			_destRect.w=_srcRect.w*texXScale;
-			_destRect.h=_srcRect.h*texYScale;
-			//printf("Dest dimensionds is %dx%d;%.6f;%.6f\n",_destRect.w,_destRect.h,texXScale,texYScale);
+			_destRect.w=destW;
+			_destRect.h=destH;
 			_destRect.x=destX;
 			_destRect.y=destY;
 	
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_part_scale(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale);
+			//sf2d_draw_texture_part_scale(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale);
 		#endif
 	}
 
-	void drawTextureScaleTint(const crossTexture passedTexture, int destX, int destY, double texXScale, double texYScale, unsigned char r, unsigned char g, unsigned char b){
+	void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
 		EASYFIXCOORDS(&destX,&destY);
 		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_tint_scale(passedTexture,destX,destY,texXScale,texYScale,RGBA8(r,g,b,255));
+			vita2d_draw_texture_tint_sized(passedTexture,destX,destY,destW,destH,RGBA8(r,g,b,255));
 		#elif GBREND == GBREND_SDL
 			unsigned char oldr;
 			unsigned char oldg;
@@ -181,8 +181,8 @@
 			_srcRect.x=0;
 			_srcRect.y=0;
 		
-			_destRect.w=(_srcRect.w*texXScale);
-			_destRect.h=(_srcRect.h*texYScale);
+			_destRect.w=destW;
+			_destRect.h=destH;
 	
 			_destRect.x=destX;
 			_destRect.y=destY;
@@ -190,15 +190,14 @@
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 			SDL_SetTextureColorMod(passedTexture, oldr, oldg, oldb);
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_scale_blend(passedTexture,destX,destY,texXScale,texYScale,RGBA8(r,g,b,255));
-			
+			//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,texXScale,texYScale,RGBA8(r,g,b,255));
 		#endif
 	}
 
-	void drawTexturePartScaleTintAlpha(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, double texXScale, double texYScale, unsigned char r, unsigned char g, unsigned b, unsigned char a){
+	void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, int destW, int destH, unsigned char r, unsigned char g, unsigned b, unsigned char a){
 		EASYFIXCOORDS(&destX,&destY);
 		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_tint_part_scale(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale,RGBA8(r,g,b,a));
+			vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,texX,texY,texW, texH, destW, destH,RGBA8(r,g,b,a));
 		#elif GBREND == GBREND_SDL
 			unsigned char oldr;
 			unsigned char oldg;
@@ -216,8 +215,8 @@
 			_srcRect.x=texX;
 			_srcRect.y=texY;
 		
-			_destRect.w=_srcRect.w*texXScale;
-			_destRect.h=_srcRect.h*texYScale;
+			_destRect.w=destW;
+			_destRect.h=destH;
 	
 			_destRect.x=destX;
 			_destRect.y=destY;
@@ -226,18 +225,18 @@
 			SDL_SetTextureColorMod(passedTexture, oldr, oldg, oldb);
 			SDL_SetTextureAlphaMod(passedTexture, olda);
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale, RGBA8(r,g,b,a));
+			//sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,texX,texY,texW, texH, texXScale, texYScale, RGBA8(r,g,b,a));
 		#endif
 	}
 
-	void drawTexturePartScaleTint(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, double texXScale, double texYScale, unsigned char r, unsigned char g, unsigned char b){
-		drawTexturePartScaleTintAlpha(passedTexture, destX, destY, texX, texY, texW, texH, texXScale, texYScale, r, g, b,255);
+	void drawTexturePartSizedTint(const crossTexture passedTexture, int destX, int destY, int texX, int texY, int texW, int texH, double texXScale, double texYScale, unsigned char r, unsigned char g, unsigned char b){
+		drawTexturePartSizedTintAlpha(passedTexture, destX, destY, texX, texY, texW, texH, texXScale, texYScale, r, g, b,255);
 	}
 	
-	void drawTextureScale(const crossTexture passedTexture, int destX, int destY, double texXScale, double texYScale){
+	void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH){
 		EASYFIXCOORDS(&destX,&destY);
 		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_scale(passedTexture,destX,destY,texXScale,texYScale);
+			vita2d_draw_texture_sized(passedTexture,destX,destY,destW,destH);
 		#elif GBREND == GBREND_SDL
 			SDL_Rect _srcRect;
 			SDL_Rect _destRect;
@@ -246,53 +245,18 @@
 			_srcRect.x=0;
 			_srcRect.y=0;
 		
-			_destRect.w=(_srcRect.w*texXScale);
-			_destRect.h=(_srcRect.h*texYScale);
+			_destRect.w=destW;
+			_destRect.h=destH;
 	
 			_destRect.x=destX;
 			_destRect.y=destY;
 	
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_scale(passedTexture,destX,destY,texXScale,texYScale);
+			//sf2d_draw_texture_scale(passedTexture,destX,destY,texXScale,texYScale);
 		#endif
 	}
 
-	void drawTextureScaleSize(const crossTexture passedTexture, int destX, int destY, double texXScale, double texYScale){
-		EASYFIXCOORDS(&destX,&destY);
-		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_scale(passedTexture,destX,destY,texXScale/(double)getTextureWidth(passedTexture),texYScale/(double)getTextureHeight(passedTexture));
-		#elif GBREND == GBREND_SDL
-			SDL_Rect _srcRect;
-			SDL_Rect _destRect;
-			SDL_QueryTexture(passedTexture, NULL, NULL, &(_srcRect.w), &(_srcRect.h));
-			
-			_srcRect.x=0;
-			_srcRect.y=0;
-		
-			_destRect.w=(texXScale);
-			_destRect.h=(texYScale);
-	
-			_destRect.x=destX;
-			_destRect.y=destY;
-	
-			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
-		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_scale(passedTexture,destX,destY,texXScale,texYScale);
-		#endif
-	}
-	
-	// TODO MAKE ROTATE ON WINDOWS
-	void drawTexturePartScaleRotate(const crossTexture texture, int x, int y, int tex_x, int tex_y, int tex_w, int tex_h, double x_scale, double y_scale, double rad){
-		EASYFIXCOORDS(&x,&y);
-		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_part_scale_rotate(texture,x,y,tex_x,tex_y,tex_w,tex_h,x_scale,y_scale,rad);
-		#elif GBREND == GBREND_SDL
-			drawTexturePartScale(texture,x,y,tex_x,tex_y,tex_w,tex_h,x_scale,y_scale);
-		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_part_rotate_scale(texture,x,y,rad,tex_x,tex_y,tex_w,tex_h,x_scale,y_scale);
-		#endif
-	}
 	void drawTextureAlpha(const crossTexture passedTexture, int _destX, int _destY, unsigned char alpha){
 		EASYFIXCOORDS(&_destX,&_destY);
 		#if GBREND == GBREND_VITA2D
@@ -321,10 +285,10 @@
 			sf2d_draw_texture_blend(passedTexture,_destX,_destY,RGBA8(255,255,255,alpha));
 		#endif
 	}
-	void drawTextureScaleAlpha(const crossTexture passedTexture, int destX, int destY, double texXScale, double texYScale, unsigned char alpha){
+	void drawTextureSizedAlpha(const crossTexture passedTexture, int destX, int destY, int texW, int texH, unsigned char alpha){
 		EASYFIXCOORDS(&destX,&destY);
 		#if GBREND == GBREND_VITA2D
-			vita2d_draw_texture_tint_scale(passedTexture,destX,destY,texXScale,texYScale,RGBA8(255,255,255,alpha));
+			vita2d_draw_texture_tint_sized(passedTexture,destX,destY,texW,texH,RGBA8(255,255,255,alpha));
 		#elif GBREND == GBREND_SDL
 			unsigned char oldAlpha;
 			SDL_GetTextureAlphaMod(passedTexture, &oldAlpha);
@@ -336,8 +300,8 @@
 			_srcRect.x=0;
 			_srcRect.y=0;
 		
-			_destRect.w=(_srcRect.w*texXScale);
-			_destRect.h=(_srcRect.h*texYScale);
+			_destRect.w=texW;
+			_destRect.h=texH;
 	
 			_destRect.x=destX;
 			_destRect.y=destY;
@@ -345,7 +309,7 @@
 			SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
 			SDL_SetTextureAlphaMod(passedTexture, oldAlpha);
 		#elif GBREND == GBREND_SF2D
-			sf2d_draw_texture_scale_blend(passedTexture,destX,destY,texXScale,texYScale,RGBA8(255,255,255,alpha));
+			//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,texXScale,texYScale,RGBA8(255,255,255,alpha));
 		#endif
 	}
 
