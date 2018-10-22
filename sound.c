@@ -1,9 +1,12 @@
-
 #include <goodbrew/config.h>
 #include <goodbrew/sound.h>
 
 #if GBSND == GBSND_SOLOUD
 	Soloud* mySoLoudEngine;
+#endif
+
+#if GBSND == GBSND_VITA
+	#include "VitaSoundCode.h"
 #endif
 
 char mp3Supported(){
@@ -184,22 +187,17 @@ void stopSound(crossSE toStop){
 		stopMusic(toStop);
 	#endif
 }
-crossPlayHandle playSound(crossSE toPlay, int timesToPlay, unsigned char _passedChannel){
+crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel){
 	#if GBSND == GBSND_SDL
-		Mix_PlayChannel( -1, toPlay, timesToPlay-1 );
+		Mix_PlayChannel( -1, toPlay, 0 );
 		return toPlay;
 	#elif GBSND == GBSND_SOLOUD
-		if (timesToPlay!=1){
-			printf("SoLoud can only play a sound once!");
-		}
 		return Soloud_play(mySoLoudEngine,toPlay);
 	#elif GBSND == GBSND_3DS
 		ndspChnWaveBufClear(_passedChannel);
 		nathanPlaySound(toPlay, _passedChannel);
 		return toPlay->_musicChannel;
 	#elif GBSND == GBSND_VITA
-		if (_passedChannel==1 || timesToPlay==1){ // PREVENT COMPILER WARNING
-		}
 		mlgsnd_play(toPlay);
 		return toPlay;
 	#elif GBSND == SND_NONE
