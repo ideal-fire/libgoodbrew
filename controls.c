@@ -37,7 +37,7 @@ int fixButtonAlias(int _passedButton){
 #if GBREND == GBREND_SDL
 	void _readSDLControls(){
 		lastSDLPressedKey=SDLK_UNKNOWN;
-		memset(currentPad,0,sizeof(currentPad));
+		memcpy(currentPad,lastPad,sizeof(currentPad));
 		SDL_Event e;
 		while( SDL_PollEvent( &e ) != 0 ){
 			if( e.type == SDL_QUIT ){
