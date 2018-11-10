@@ -142,8 +142,9 @@ void setClearColor(int r, int g, int b){
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
 	#endif
 }
-void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
-	EASYFIXCOORDS(&x,&y);
+
+// Evade fix coords
+void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_rectangle(x,y,w,h,RGBA8(r,g,b,a));
 	#elif GBREND == GBREND_SDL
@@ -163,4 +164,18 @@ void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_rectangle(x,y,w,h,RGBA8(r,g,b,a));
 	#endif
+}
+
+void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
+	EASYFIXCOORDS(&x,&y);
+	_drawRectangle(x,y,w,h,r,g,b,a);
+}
+
+void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b){
+	int _halfWastedHeight = (_goodbrewRealScreenHeight-_usedHeight)/2;
+	_drawRectangle(0,0,_goodbrewRealScreenWidth,_halfWastedHeight,r,g,b,255);
+	_drawRectangle(0,_goodbrewRealScreenHeight-_halfWastedHeight,_goodbrewRealScreenWidth,_halfWastedHeight,r,g,b,255);
+	_halfWastedHeight = (_goodbrewRealScreenWidth-_usedWidth)/2;
+	_drawRectangle(0,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
+	_drawRectangle(_goodbrewRealScreenWidth-_halfWastedHeight,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
 }

@@ -40,7 +40,7 @@
 // If true, define
 //	int fixX(int x)
 //	int fixY(int y)
-#define DOFIXCOORDS 0
+#define DOFIXCOORDS 1
 
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	#define GBREND GBREND_SDL

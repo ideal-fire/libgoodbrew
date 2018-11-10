@@ -12,6 +12,7 @@
 extern int _goodbrewRealScreenWidth;
 extern int _goodbrewRealScreenHeight;
 
+void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b); // Assuming that _usedWidth and _usedHeight are the dimensions of the space you're using, and you've centered everything
 void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a);
 void endDrawing();
 void FixCoords(int* _x, int* _y);
