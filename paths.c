@@ -94,12 +94,12 @@ char* getFixPathString(fileLocationType type){
 	}
 }
 
-void fixPath(char* filename,char _buffer[], fileLocationType type){
-	strcpy((char*)_buffer,getFixPathString(type));
-	strcat((char*)_buffer,filename);
+void fixPath(const char* filename,char* _buffer, fileLocationType type){
+	strcpy(_buffer,getFixPathString(type));
+	strcat(_buffer,filename);
 }
 
-char* fixPathAlloc(char* filename, fileLocationType type){
+char* fixPathAlloc(const char* filename, fileLocationType type){
 	char* _foundPrefix = getFixPathString(type);
 	char* _returnBuff = malloc(strlen(filename)+strlen(_foundPrefix)+1);
 	strcpy(_returnBuff,_foundPrefix);

@@ -6,8 +6,8 @@ typedef enum{
 	TYPE_EMBEDDED
 }fileLocationType;
 
-char* fixPathAlloc(char* filename, fileLocationType type);
-void fixPath(char* filename,char _buffer[], fileLocationType type);
+char* fixPathAlloc(const char* filename, fileLocationType type);
+void fixPath(const char* filename,char* _buffer, fileLocationType type);
 void generateDefaultDataDirectory(char** _dataDirPointer);
 char* getFixPathString(fileLocationType type);
 void makeDataDirectory();
