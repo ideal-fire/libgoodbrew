@@ -22,6 +22,7 @@ void drawTextureSizedAlpha(const crossTexture passedTexture, int destX, int dest
 void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b);
 void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH);
 void drawTexture(const crossTexture passedTexture, int _destX, int _destY);
+void drawTextureScaled(const crossTexture passedTexture, int destX, int destY, double _scaleFactor);
 void freeTexture(crossTexture passedTexture);
 int getTextureHeight(const crossTexture passedTexture);
 int getTextureWidth(const crossTexture passedTexture);

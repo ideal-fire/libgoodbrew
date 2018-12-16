@@ -33,6 +33,7 @@
 		crossTexture surfaceToTexture(SDL_Surface* _tempSurface){
 			SDL_Texture* _returnTexture = SDL_CreateTextureFromSurface( mainWindowRenderer, _tempSurface );
 			SDL_FreeSurface(_tempSurface);
+			SDL_SetTextureBlendMode(_returnTexture, SDL_BLENDMODE_BLEND); // Allow the texture to be drawn translucent
 			return _returnTexture;
 		}
 	#endif
@@ -315,5 +316,7 @@
 			//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,texXScale,texYScale,RGBA8(255,255,255,alpha));
 		#endif
 	}
-
+	void drawTextureScaled(const crossTexture passedTexture, int destX, int destY, double _scaleFactor){
+		drawTextureSized(passedTexture,destX,destY,getTextureWidth(passedTexture)*_scaleFactor,getTextureHeight(passedTexture)*_scaleFactor);
+	}
 #endif

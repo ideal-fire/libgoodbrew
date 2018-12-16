@@ -24,6 +24,7 @@ typedef enum{
 
 void controlsEnd();
 void controlsStart();
+#define controlsReset() controlsStart(); controlsEnd();
 int fixButtonAlias(int _passedButton);
 char isDown(crossButton _passedButton);
 char wasJustPressed(crossButton _passedButton);
