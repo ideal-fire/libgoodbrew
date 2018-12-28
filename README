@@ -1,1 +1,5 @@
-TODO - Write about how to use bitmap fonts
+How to use bitmap fonts
+------
+This can use bitmap fonts exported by the program fontbuilder. (https://github.com/andryblack/fontbuilder)
+Export the description in the "simple" format and the image as a PNG. The filename of the PNG is stored in the description, so don't change it.
+When loading the font with the loadFont function, pass the filename for the description file.
