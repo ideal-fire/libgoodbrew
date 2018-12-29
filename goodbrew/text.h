@@ -1,9 +1,12 @@
 #ifndef GOODBREWTEXTINCLUDED_H
 #define GOODBREWTEXTINCLUDED_H
 
+#define BITMAP_FONT_FAKE_SIZE 28
+
 struct goodbrewfont;
 typedef struct goodbrewfont* crossFont;
 
+double getResonableFontSize(char _passedType);
 void freeFont(crossFont _passedFont);
 void gbDrawTextAlpha(crossFont _passedFont, int x, int y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void gbDrawTextf(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, const char* _formatString, ...);

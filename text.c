@@ -33,6 +33,7 @@ struct bitmapFontLetter{
 	short imageWidth;
 	short imageHeight;
 	short imageDisplayWidth;
+	short yOffset;
 };
 
 struct loadedBitmapFont{
@@ -49,12 +50,12 @@ double _bitmapFontScaleGet(struct loadedBitmapFont* _passed, double _passedSize)
 }
 void drawBitmapLetterColorAlpha(struct loadedBitmapFont* _passedFont, double _passedSize, int letterId, int _x, int _y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	letterId-=_passedFont->firstLetter;
-	drawTexturePartSizedTintAlpha(_passedFont->internalImage,_x,_y+_passedFont->letterInfos[letterId].y*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageWidth*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageHeight*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].x,_passedFont->letterInfos[letterId].y,_passedFont->letterInfos[letterId].imageWidth,_passedFont->letterInfos[letterId].imageHeight,r,g,b,a);
+	drawTexturePartSizedTintAlpha(_passedFont->internalImage,_x,_y+_passedFont->letterInfos[letterId].yOffset*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageWidth*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageHeight*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].x,_passedFont->letterInfos[letterId].y,_passedFont->letterInfos[letterId].imageWidth,_passedFont->letterInfos[letterId].imageHeight,r,g,b,a);
 }
 
 double getResonableFontSize(char _passedType){
 	if (_passedType==GBTXT_BITMAP){
-		return 28;
+		return BITMAP_FONT_FAKE_SIZE;
 	}
 	#if GBTXT == GBTXT_FONTCACHE
 		return 20;
@@ -93,9 +94,14 @@ crossFont loadFont(const char* filename, double _passedSize){
 		if (fp!=NULL){
 			struct loadedBitmapFont* _retBitmapFont = malloc(sizeof(struct loadedBitmapFont));
 
-			seekNextLine(fp); // Seek past font name
-			fscanf(fp,"%hd %hd\n",&_retBitmapFont->exportedSize,&_retBitmapFont->height);
-
+			char _firstByte;
+			// If the first byte is 0, that tells the program to load a different, special sfl format. For a regular sfl file, the first byte should never be 0 because the first byte should be part of the font name.
+			fread(&_firstByte,1,1,fp);
+			if (_firstByte!=0){ // If it's not the special format
+				seekNextLine(fp); // Seek past the rest of the font name
+				fscanf(fp,"%hd %*hd\n",&_retBitmapFont->exportedSize); // Ignore the second number, the stored height, because it's too tall
+			}
+			// This is here because the special format and regular format share it
 			char* _tempReadName = fancyReadLine(fp);
 			char* _completeImagePath = swapFilename(filename,_tempReadName);
 			_retBitmapFont->internalImage = loadPNG(_completeImagePath);
@@ -104,17 +110,53 @@ crossFont loadFont(const char* filename, double _passedSize){
 			}
 			free(_tempReadName);
 			free(_completeImagePath);
+			if (_firstByte==0){
+				// Special sfl format:
+				// (0x00)whatever_png_filename\n
+				// first_characters_ascii_value width_of_characters height_of_characters
+				short _readWidth;
+				short _readHeight;
+				fscanf(fp,"%hd %hd %hd",&_retBitmapFont->firstLetter,&_readWidth,&_readHeight);
 
-			fscanf(fp,"%hd\n",&_retBitmapFont->numLetters);
-			
-			_retBitmapFont->letterInfos = malloc(sizeof(struct bitmapFontLetter)*_retBitmapFont->numLetters);
+				short _imageWidthChars = (getTextureWidth(_retBitmapFont->internalImage)/_readWidth);
+				short _imageHeightChars = (getTextureHeight(_retBitmapFont->internalImage)/_readHeight);
+				
+				_retBitmapFont->numLetters = _imageWidthChars*_imageHeightChars;
 
-			int _highestReadIndex;
-			int i;
-			for (i=0;i<_retBitmapFont->numLetters;++i){
-				fscanf(fp,"%d %hd %hd %hd %hd %*d %*d %hd\n",&_highestReadIndex,&(_retBitmapFont->letterInfos[i].x),&(_retBitmapFont->letterInfos[i].y),&(_retBitmapFont->letterInfos[i].imageWidth),&(_retBitmapFont->letterInfos[i].imageHeight),&(_retBitmapFont->letterInfos[i].imageDisplayWidth));
+				_retBitmapFont->letterInfos = malloc(sizeof(struct bitmapFontLetter)*_retBitmapFont->numLetters);
+				_retBitmapFont->exportedSize = BITMAP_FONT_FAKE_SIZE;
+				_retBitmapFont->height = _readHeight;
+				int i;
+				for (i=0;i<_imageHeightChars;++i){
+					int j;
+					for (j=0;j<_imageWidthChars;++j){
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].x = j*_readWidth;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].y = i*_readWidth;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].yOffset=0;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].imageWidth = _readWidth;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].imageHeight = _readHeight;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].imageDisplayWidth = _readWidth;
+					}
+				}
+			}else{
+				fscanf(fp,"%hd\n",&_retBitmapFont->numLetters);
+				
+				_retBitmapFont->letterInfos = malloc(sizeof(struct bitmapFontLetter)*_retBitmapFont->numLetters);
+	
+				int _highestHeight=0;
+				int _highestReadIndex;
+				int i;
+				for (i=0;i<_retBitmapFont->numLetters;++i){
+					fscanf(fp,"%d %hd %hd %hd %hd %*d %*d %hd\n",&_highestReadIndex,&(_retBitmapFont->letterInfos[i].x),&(_retBitmapFont->letterInfos[i].y),&(_retBitmapFont->letterInfos[i].imageWidth),&(_retBitmapFont->letterInfos[i].imageHeight),&(_retBitmapFont->letterInfos[i].imageDisplayWidth));
+
+					_retBitmapFont->letterInfos[i].yOffset = _retBitmapFont->letterInfos[i].y;
+					if (_retBitmapFont->letterInfos[i].imageHeight+_retBitmapFont->letterInfos[i].yOffset>_highestHeight){
+						_highestHeight = _retBitmapFont->letterInfos[i].imageHeight+_retBitmapFont->letterInfos[i].yOffset;
+					}
+				}
+				_retBitmapFont->height=_highestHeight;
+				_retBitmapFont->firstLetter = _highestReadIndex-(_retBitmapFont->numLetters-1);
 			}
-			_retBitmapFont->firstLetter = _highestReadIndex-(_retBitmapFont->numLetters-1);
 			fclose(fp);
 
 			_retFont->data = _retBitmapFont;

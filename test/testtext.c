@@ -21,15 +21,21 @@ int main(int argc, char const *argv[]){
 	int _realHeight;
 	initGraphics(640,480,&_realWidth,&_realHeight);
 
-	crossFont myfont = loadFont("./liberation-sans-bitmap.sfl",-1);
+	crossFont loadedSimpleBitmap = loadFont("./vincent-font.sfl",getResonableFontSize(GBTXT_BITMAP));
+	crossFont loadedFancyBitmap = loadFont("./liberation-sans-bitmap.sfl",-1);
+	crossFont loadedFancyFont = loadFont("./LiberationSans.ttf",getResonableFontSize(GBTXT));
 	
 	startDrawing();
-	gbDrawTextf(myfont, 0, textHeight(myfont), 0, 255, 0, 255, "%s %d %s", "Based on",5,"seconds, Magical Girl Lyrical Nanoha has a cute dub");
+	gbDrawText(loadedSimpleBitmap, 0, 0, "Simple bitmap font", 255,255,255);
+	gbDrawText(loadedFancyBitmap, 0, textHeight(loadedSimpleBitmap), "Fancy bitmap font", 255,255,255);
+	gbDrawTextf(loadedFancyFont, 0, textHeight(loadedSimpleBitmap)+textHeight(loadedFancyBitmap), 0, 255, 0, 255, "%s %d %s", "Based on",5,"seconds, Magical Girl Lyrical Nanoha has a cute dub");
 	endDrawing();
 
 	wait(500);
 
-	freeFont(myfont);
+	freeFont(loadedSimpleBitmap);
+	freeFont(loadedFancyBitmap);
+	freeFont(loadedFancyFont);
 
 	generalGoodQuit();
 	return 0;
