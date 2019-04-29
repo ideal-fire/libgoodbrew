@@ -53,9 +53,9 @@ int fixButtonAlias(int _passedButton){
 					_isDown=1;
 					lastSDLPressedKey = e.key.keysym.sym;
 				}
-				if (e.key.keysym.sym==SDLK_z){
+				if (e.key.keysym.sym==SDLK_x){
 					currentPad[BUTTON_A]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_x){
+				}else if (e.key.keysym.sym==SDLK_z){
 					currentPad[BUTTON_B]=_isDown;
 				}else if (e.key.keysym.sym==SDLK_LEFT){
 					currentPad[BUTTON_LEFT]=_isDown;
