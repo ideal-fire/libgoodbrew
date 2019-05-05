@@ -93,11 +93,7 @@ signed char checkFileExist(const char* location){
 			return 1;
 		}
 	#elif GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
-		if( access( location, F_OK ) != -1 ) {
-			return 1;
-		} else {
-			return 0;
-		}
+		return (access( location, F_OK ) != -1);
 	#else
 		FILE* fp = fopen(location,"r");
 		if (fp==NULL){
@@ -256,6 +252,21 @@ void removeNewline(char* _toRemove){
 			_toRemove[_cachedStrlen-1]='\0';
 		}
 	}
+}
+size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile stream){
+	#if GBPLAT == GB_VITA
+		size_t _writtenElements = fwrite(buffer,size,count,stream->fp);
+		if (_writtenElements==0 && count!=0 && feof(stream->fp)==0){
+			_fixVitaFile(stream);
+			return crossfwrite(buffer,size,count,stream);
+		}
+		stream->internalPosition += size*_writtenElements;
+		return _writtenElements;
+	#elif GBREND == GBREND_SDL
+		return SDL_RWwrite(stream,buffer,size,count);
+	#else
+		return fwrite(buffer,size,count,stream);
+	#endif
 }
 // Returns number of elements read
 size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){

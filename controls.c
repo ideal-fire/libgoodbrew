@@ -25,6 +25,9 @@ char buttonAlias[NUMBUTTONS];
 	char lastClickWasRight;
 #endif
 
+// so we can assign to a char
+#define TOBOOL(x) ((x)>0)
+
 //////////////////////////////////////////////////////////
 
 int fixButtonAlias(int _passedButton){
@@ -114,51 +117,50 @@ void controlsStart(){
 	#if GBPLAT == GB_VITA
 		SceCtrlData _pad;
 		sceCtrlPeekBufferPositive(0, &_pad, 1);
-
-		currentPad[BUTTON_A] = _pad.buttons & SCE_CTRL_CROSS;
-		currentPad[BUTTON_B] = _pad.buttons & SCE_CTRL_CIRCLE;
-		currentPad[BUTTON_X] = _pad.buttons & SCE_CTRL_TRIANGLE;
-		currentPad[BUTTON_Y] = _pad.buttons & SCE_CTRL_SQUARE;
-		currentPad[BUTTON_L] = _pad.buttons & SCE_CTRL_LTRIGGER;
-		currentPad[BUTTON_R] = _pad.buttons & SCE_CTRL_RTRIGGER;
-		currentPad[BUTTON_UP] = _pad.buttons & SCE_CTRL_UP;
-		currentPad[BUTTON_DOWN] = _pad.buttons & SCE_CTRL_DOWN;
-		currentPad[BUTTON_LEFT] = _pad.buttons & SCE_CTRL_LEFT;
-		currentPad[BUTTON_RIGHT] = _pad.buttons & SCE_CTRL_RIGHT;
-		currentPad[BUTTON_START] = _pad.buttons & SCE_CTRL_START;
-		currentPad[BUTTON_SELECT] = _pad.buttons & SCE_CTRL_SELECT;
+		currentPad[BUTTON_A] = 		TOBOOL(_pad.buttons & SCE_CTRL_CROSS);
+		currentPad[BUTTON_B] = 		TOBOOL(_pad.buttons & SCE_CTRL_CIRCLE);
+		currentPad[BUTTON_X] = 		TOBOOL(_pad.buttons & SCE_CTRL_TRIANGLE);
+		currentPad[BUTTON_Y] = 		TOBOOL(_pad.buttons & SCE_CTRL_SQUARE);
+		currentPad[BUTTON_L] = 		TOBOOL(_pad.buttons & SCE_CTRL_LTRIGGER);
+		currentPad[BUTTON_R] = 		TOBOOL(_pad.buttons & SCE_CTRL_RTRIGGER);
+		currentPad[BUTTON_UP] = 	TOBOOL(_pad.buttons & SCE_CTRL_UP);
+		currentPad[BUTTON_DOWN] = 	TOBOOL(_pad.buttons & SCE_CTRL_DOWN);
+		currentPad[BUTTON_LEFT] = 	TOBOOL(_pad.buttons & SCE_CTRL_LEFT);
+		currentPad[BUTTON_RIGHT] = 	TOBOOL(_pad.buttons & SCE_CTRL_RIGHT);
+		currentPad[BUTTON_START] = 	TOBOOL(_pad.buttons & SCE_CTRL_START);
+		currentPad[BUTTON_SELECT] = TOBOOL(_pad.buttons & SCE_CTRL_SELECT);
 	#elif GBPLAT == GB_3DS
 		hidScanInput();
 		u32 _pad = hidKeysHeld();
 		
-		currentPad[BUTTON_A] 		= _pad & KEY_A;
-		currentPad[BUTTON_B] 		= _pad & KEY_B;
-		currentPad[BUTTON_X] 		= _pad & KEY_X;
-		currentPad[BUTTON_Y] 		= _pad & KEY_Y;
-		currentPad[BUTTON_L] 		= _pad & KEY_L;
-		currentPad[BUTTON_R] 		= _pad & KEY_R;
-		currentPad[BUTTON_UP] 		= _pad & KEY_UP;
-		currentPad[BUTTON_DOWN] 	= _pad & KEY_DOWN;
-		currentPad[BUTTON_LEFT] 	= _pad & KEY_LEFT;
-		currentPad[BUTTON_RIGHT] 	= _pad & KEY_RIGHT;
-		currentPad[BUTTON_START] 	= _pad & KEY_START;
-		currentPad[BUTTON_SELECT] 	= _pad & KEY_SELECT;
+		currentPad[BUTTON_A] 		= TOBOOL(_pad & KEY_A)
+		currentPad[BUTTON_B] 		= TOBOOL(_pad & KEY_B)
+		currentPad[BUTTON_X] 		= TOBOOL(_pad & KEY_X)
+		currentPad[BUTTON_Y] 		= TOBOOL(_pad & KEY_Y)
+		currentPad[BUTTON_L] 		= TOBOOL(_pad & KEY_L)
+		currentPad[BUTTON_R] 		= TOBOOL(_pad & KEY_R)
+		currentPad[BUTTON_UP] 		= TOBOOL(_pad & KEY_UP)
+		currentPad[BUTTON_DOWN] 	= TOBOOL(_pad & KEY_DOWN)
+		currentPad[BUTTON_LEFT] 	= TOBOOL(_pad & KEY_LEFT)
+		currentPad[BUTTON_RIGHT] 	= TOBOOL(_pad & KEY_RIGHT)
+		currentPad[BUTTON_START] 	= TOBOOL(_pad & KEY_START)
+		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_SELECT)
 	#elif GBPLAT == GB_SWITCH
 		hidScanInput();
 		u64 _pad = hidKeysHeld(CONTROLLER_P1_AUTO);
 
-		currentPad[BUTTON_A] 		= _pad & KEY_A;
-		currentPad[BUTTON_B] 		= _pad & KEY_B;
-		currentPad[BUTTON_X] 		= _pad & KEY_X;
-		currentPad[BUTTON_Y] 		= _pad & KEY_Y;
-		currentPad[BUTTON_L] 		= _pad & KEY_ZL;
-		currentPad[BUTTON_R] 		= _pad & KEY_ZR;
-		currentPad[BUTTON_UP] 		= _pad & KEY_UP;
-		currentPad[BUTTON_DOWN] 	= _pad & KEY_DOWN;
-		currentPad[BUTTON_LEFT] 	= _pad & KEY_LEFT;
-		currentPad[BUTTON_RIGHT] 	= _pad & KEY_RIGHT;
-		currentPad[BUTTON_START] 	= _pad & KEY_PLUS;
-		currentPad[BUTTON_SELECT] 	= _pad & KEY_MINUS;
+		currentPad[BUTTON_A] 		= TOBOOL(_pad & KEY_A);
+		currentPad[BUTTON_B] 		= TOBOOL(_pad & KEY_B);
+		currentPad[BUTTON_X] 		= TOBOOL(_pad & KEY_X);
+		currentPad[BUTTON_Y] 		= TOBOOL(_pad & KEY_Y);
+		currentPad[BUTTON_L] 		= TOBOOL(_pad & KEY_ZL);
+		currentPad[BUTTON_R] 		= TOBOOL(_pad & KEY_ZR);
+		currentPad[BUTTON_UP] 		= TOBOOL(_pad & KEY_UP);
+		currentPad[BUTTON_DOWN] 	= TOBOOL(_pad & KEY_DOWN);
+		currentPad[BUTTON_LEFT] 	= TOBOOL(_pad & KEY_LEFT);
+		currentPad[BUTTON_RIGHT] 	= TOBOOL(_pad & KEY_RIGHT);
+		currentPad[BUTTON_START] 	= TOBOOL(_pad & KEY_PLUS);
+		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_MINUS);
 	#elif GBREND == GBREND_SDL
 		// This is only a function because I don't want all this messy code here
 		_readSDLControls();

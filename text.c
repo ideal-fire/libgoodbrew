@@ -21,12 +21,6 @@
 #include <goodbrew/graphics.h>
 #include <goodbrew/images.h>
 
-struct goodbrewfont{
-	void* data;
-	char type;
-	double size;
-};
-
 struct bitmapFontLetter{
 	short x;
 	short y;
@@ -191,7 +185,7 @@ int textHeight(crossFont _passedFont){
 	#if GBTXT == GBTXT_VITA2D
 		return vita2d_font_text_height(_passedFont->data,_passedFont->size,"a");
 	#elif GBTXT == GBTXT_FONTCACHE
-		return floor(FC_GetRealHeight(_passedFont->data));
+		return floor(FC_GetLineHeight(_passedFont->data));
 	#elif GBTXT == TEXT_UNDEFINED
 		return 32;
 	#endif
@@ -234,7 +228,7 @@ void gbDrawTextAlpha(crossFont _passedFont, int x, int y, const char* text, unsi
 		}
 	}else{
 		#if GBTXT == GBTXT_VITA2D
-			vita2d_font_draw_text(_passedFont->data,x,y+textHeight(_passedFont,_passedFont->size), RGBA8(r,g,b,a),_passedFont->size,text);
+			vita2d_font_draw_text(_passedFont->data,x,y+textHeight(_passedFont), RGBA8(r,g,b,a),_passedFont->size,text);
 		#elif GBTXT == GBTXT_FONTCACHE
 			SDL_Color _tempcolor;
 			_tempcolor.r = r;

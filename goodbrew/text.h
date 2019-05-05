@@ -3,7 +3,11 @@
 
 #define BITMAP_FONT_FAKE_SIZE 28
 
-struct goodbrewfont;
+struct goodbrewfont{
+	void* data;
+	char type;
+	double size;
+};
 typedef struct goodbrewfont* crossFont;
 
 double getResonableFontSize(char _passedType);

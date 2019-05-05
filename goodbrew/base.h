@@ -76,6 +76,7 @@ int crossfclose(crossFile stream);
 char crossfeof(crossFile fp);
 crossFile crossfopen(const char* filename, const char* mode);
 size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream);
+size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile stream);
 int crossfseek(crossFile stream, long int offset, int origin);
 long int crossftell(crossFile fp);
 int crossgetc(crossFile fp);

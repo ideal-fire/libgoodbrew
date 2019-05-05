@@ -4,19 +4,24 @@
 #include <goodbrew/config.h>
 #include <goodbrew/base.h>
 #include <goodbrew/paths.h>
+#include <goodbrew/useful.h>
 
-char* dataFolder=NULL;
+char* gbDataFolder=NULL;
 
 // Passed string should be freed already
-void generateDefaultDataDirectory(char** _dataDirPointer){
+signed char generateDefaultDataDirectory(char** _dataDirPointer, signed char _dataDirPreference){
+	if (_dataDirPreference==-1){
+		generateDefaultDataDirectory(_dataDirPointer,1);
+		if (!directoryExists(*_dataDirPointer)){
+			free(*_dataDirPointer);
+			return generateDefaultDataDirectory(_dataDirPointer,0);
+		}
+		return 1;
+	}
 	#if GBPLAT == GB_ANDROID
-		*_dataDirPointer = malloc(strlen("/data/data//")+strlen(androidPackageName)+1);
-		strcpy(*_dataDirPointer,"/data/data/");
-		strcat(*_dataDirPointer,androidPackageName);
-		strcat(*_dataDirPointer,"/");
+		*_dataDirPointer = easySprintf("/data/data/%s/",androidPackageName);
 	#elif GBPLAT == GB_LINUX
-		*_dataDirPointer = malloc(strlen("./")+1);
-		strcpy(*_dataDirPointer,"./");
+		*_dataDirPointer = strdup("./");
 	#elif GBPLAT == GB_WINDOWS
 		char _buffer[1000];
 		if (GetModuleFileName(NULL,_buffer,sizeof(_buffer))==0){
@@ -33,42 +38,34 @@ void generateDefaultDataDirectory(char** _dataDirPointer){
 		}
 		*_dataDirPointer = strdup(_buffer);
 	#elif GBPLAT == GB_VITA
-		// Use uma0 data directory if it exists, otherwise fallback on ux0
-		*_dataDirPointer = malloc(strlen("uma0:data//")+strlen(vitaAppId)+1);
-		strcpy(*_dataDirPointer,"uma0:data/");
-		strcat(*_dataDirPointer,vitaAppId);
-		strcat(*_dataDirPointer,"/");
-		if (!directoryExists(*_dataDirPointer)){
-			free(*_dataDirPointer);
-			*_dataDirPointer = malloc(strlen("ux0:data//")+strlen(vitaAppId)+1);
-			strcpy(*_dataDirPointer,"ux0:data/");
-			strcat(*_dataDirPointer,vitaAppId);
-			strcat(*_dataDirPointer,"/");
+		const char* _format;
+		if (_dataDirPreference==0){
+			_format="ux0:data/%s/";
+		}else if (_dataDirPreference==1){
+			_format="uma0:data/%s/";
+		}else{
+			printf("Invalid _dataDirPreference %d\n",_dataDirPreference);
 		}
+		*_dataDirPointer = easySprintf(_format,vitaAppId);
 	#elif GBPLAT == GB_3DS
-		*_dataDirPointer = malloc(strlen("/3ds/data/")+strlen(vitaAppId)+2);
-		strcpy(*_dataDirPointer,"/3ds/data/");
-		strcat(*_dataDirPointer,vitaAppId);
-		strcat(*_dataDirPointer,"/");
+		*_dataDirPointer = easySprintf("/3ds/data/%s/",vitaAppId);
 	#elif GBPLAT == GB_SWITCH
-		*_dataDirPointer = malloc(strlen("/switch/")+strlen(vitaAppId)+2);
-		strcpy(*_dataDirPointer,"/switch/");
-		strcat(*_dataDirPointer,vitaAppId);
-		strcat(*_dataDirPointer,"/");
+		*_dataDirPointer = easySprintf("/switch/%s/",vitaAppId);
 	#endif
+	return _dataDirPreference;
 }
 
 char* getFixPathString(fileLocationType type){
-	if (dataFolder==NULL){
-		generateDefaultDataDirectory(&dataFolder);
+	if (gbDataFolder==NULL){
+		generateDefaultDataDirectory(&gbDataFolder,-1);
 	}
 	if (type==TYPE_DATA){
-		return dataFolder;
+		return gbDataFolder;
 	}else if (type==TYPE_EMBEDDED){
 		#if GBPLAT == GB_ANDROID
 			return "";
 		#elif GBPLAT == GB_WINDOWS
-			return dataFolder;
+			return gbDataFolder;
 		#elif GBPLAT == GB_LINUX
 			return "./";
 		#elif GBPLAT == GB_VITA
@@ -80,7 +77,7 @@ char* getFixPathString(fileLocationType type){
 			if (cacheIsCiaBuild){
 				return "romfs:/";
 			}else{
-				return dataFolder;
+				return gbDataFolder;
 			}
 		#elif GBPLAT == GB_SWITCH
 			return "romfs:/";

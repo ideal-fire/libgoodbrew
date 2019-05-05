@@ -3,7 +3,7 @@ obj = $(src:.c=.o)
 
 LDFLAGS = 
 CFLAGS = -g -I.
-OUTNAME = libgoodbrew.a
+OUTNAME = libgoodbrewvita.a
 
 CC= arm-vita-eabi-gcc
 
@@ -13,3 +13,12 @@ $(OUTNAME): $(obj)
 .PHONY: clean
 clean:
 	rm -f $(obj) $(OUTNAME)
+
+install: $(OUTNAME)
+ifndef VITASDK
+	$(error VITASDK is not defined. If you ran make with sudo, pass the -E flag to sudo.)
+endif
+	mkdir -p ${VITASDK}/arm-vita-eabi/include/goodbrew
+	cp ./goodbrew/* ${VITASDK}/arm-vita-eabi/include/goodbrew/
+	cp $(OUTNAME) ${VITASDK}/arm-vita-eabi/lib/
+	@echo installed

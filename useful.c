@@ -7,6 +7,15 @@
 #include <goodbrew/config.h>
 #include <goodbrew/base.h>
 
+#define COPYBUFF 16000
+
+#define SEPARATOR '/'
+#if GBPLAT == GB_WINDOWS
+	#undef SEPARATOR
+	#define SEPARATOR '\\'
+#endif
+
+
 #if !(_POSIX_C_SOURCE >= 200809L)
 	#define __DEFAULTGETLINEMALLOC 50
 	#define __INCREMENTGETLINEMALLOC 100
@@ -41,6 +50,85 @@
 	}
 #endif
 
+const char* findCharBackwards(const char* _startHere, const char* _endHere, int _target){
+	do{
+		if (_startHere[0]==_target){
+			return _startHere;
+		}
+		--_startHere;
+	}while(_startHere>_endHere);
+	return NULL;
+}
+
+char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
+	if (crossfeof(fp)){
+		return 1;
+	}
+	*_numRead = crossfread(_destBuffer,1,_maxRead,fp);
+	return 0;
+}
+
+void lowCopyFile(const char* _srcPath, const char* _destPath, char _canMakeDirs){
+	crossFile _destfp = crossfopen(_destPath,"wb");
+	if (_destfp!=NULL){
+		crossFile _sourcefp = crossfopen(_srcPath,"rb");
+		if (_sourcefp!=NULL){
+			char* _currentBit = malloc(COPYBUFF);
+			long _lastRead;
+			while (!readABit(_sourcefp,_currentBit,&_lastRead,COPYBUFF)){
+				if (crossfwrite(_currentBit,1,_lastRead,_destfp)!=_lastRead){
+					printf("wrote wrong number of bytes.\n");
+				}
+			}
+			free(_currentBit);
+			crossfclose(_sourcefp);
+		}else{
+			printf("Failed to open for reading %s\n",_srcPath);
+		}
+		crossfclose(_destfp);
+	}else{
+		// Make all directories that need to be made for the destination to work
+		char _shouldRetry=0;
+		if (_canMakeDirs){
+			char* _tempPath = strdup(_destPath);
+			int _numMakeDirs=0;
+			while(1){
+				char* _possibleSeparator=(char*)findCharBackwards(&(_tempPath[strlen(_tempPath)-1]),_tempPath,SEPARATOR);
+				if (_possibleSeparator!=NULL && _possibleSeparator!=_tempPath){
+					_possibleSeparator[0]='\0';
+					if (directoryExists(_tempPath)){ // When the directory that does exist is found break to create the missing ones in order.
+						break;
+					}else{
+						++_numMakeDirs;
+					}
+				}else{
+					break;
+				}
+			}
+			if (_numMakeDirs>0){
+				_shouldRetry=1;
+				int i;
+				for (i=0;i<_numMakeDirs;++i){
+					_tempPath[strlen(_tempPath)]=SEPARATOR;
+					createDirectory(_tempPath);
+				}
+			}
+			free(_tempPath);
+		}
+
+		if (_shouldRetry){
+			lowCopyFile(_srcPath,_destPath,0);
+		}else{
+			printf("Failed to open for writing %s\n",_destPath);
+		}
+	}
+}
+
+void copyFile(const char* _srcPath, const char* _destPath){
+	lowCopyFile(_srcPath,_destPath,1);
+}
+
+
 char* formatf(va_list _startedList, const char* _stringFormat){
 	va_list _doWriteArgs;
 	char* _completeString;
@@ -59,16 +147,16 @@ char* easySprintf( const char* _stringFormat, ... ) {
 	return _completeString;
 }
 
-void seekPast(FILE* fp, unsigned char _target){
+void seekPast(crossFile fp, unsigned char _target){
 	while (1){
-		int _lastRead = fgetc(fp);
+		int _lastRead = crossgetc(fp);
 		if (_lastRead==_target || _lastRead==EOF){
 			break;
 		}
 	}
 }
 
-void seekNextLine(FILE* fp){
+void seekNextLine(crossFile fp){
 	seekPast(fp,0x0A);
 }
 

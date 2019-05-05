@@ -21,6 +21,9 @@
 #define GBTXT_VITA2D 2
 #define GBTXT_FONTCACHE 3
 
+#define GBNET_NONE 0
+#define GBNET_CURL 1
+
 #if _WIN32
 	#define GBPLAT GB_WINDOWS
 #elif __ANDROID__
@@ -46,18 +49,22 @@
 	#define GBREND GBREND_SDL
 	#define GBTXT GBTXT_FONTCACHE
 	#define GBSND GBSND_SDL
+	#define GBNET GBNET_CURL
 #elif GBPLAT == GB_VITA
 	#define GBREND GBREND_VITA2D
 	#define GBTXT GBTXT_VITA2D
 	#define GBSND GBSND_VITA
+	#define GBNET GBNET_NONE
 #elif GBPLAT == GB_3DS
 	#define GBREND GBREND_SF2D
 	#define GBTXT GBTXT_BITMAP
 	#define GBSND GBSND_3DS
+	#define GBNET GBNET_NONE
 #elif GBPLAT == GB_SWITCH
 	#define GBREND GBREND_SDL
 	#define GBTXT GBTXT_FONTCACHE
 	#define GBSND GBSND_NONE
+	#define GBNET GBNET_NONE
 #endif
 
 // Define these manually in your code anywhere

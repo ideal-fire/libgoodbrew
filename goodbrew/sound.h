@@ -34,4 +34,22 @@
 	typedef int crossPlayHandle;
 #endif
 
+void fadeoutMusic(crossPlayHandle _passedHandle,int time);
+void freeMusic(crossMusic toFree);
+void freeSound(crossSE toFree);
+char initAudio();
+crossMusic loadMusic(char* filepath);
+crossSE loadSound(char* filepath);
+char mp3Supported();
+char oggSupported();
+crossPlayHandle playMusic(crossMusic toPlay, unsigned char _passedChannel);
+crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel);
+void quitAudio();
+void setMusicVolumeBefore(crossMusic _passedMusic,int vol);
+void setMusicVolume(crossPlayHandle _passedMusic,int vol);
+void setSFXVolumeBefore(crossSE tochange, int toval);
+void setSFXVolume(crossPlayHandle tochange, int toval);
+void stopMusic(crossPlayHandle toStop);
+void stopSound(crossSE toStop);
+
 #endif
