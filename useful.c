@@ -15,8 +15,8 @@
 	#define SEPARATOR '\\'
 #endif
 
-
 #if !(_POSIX_C_SOURCE >= 200809L)
+	// TODO - Make these use crossFile
 	#define __DEFAULTGETLINEMALLOC 50
 	#define __INCREMENTGETLINEMALLOC 100
 	
@@ -49,7 +49,6 @@
 		return getdelim(lineptr,n,'\n',stream);
 	}
 #endif
-
 const char* findCharBackwards(const char* _startHere, const char* _endHere, int _target){
 	do{
 		if (_startHere[0]==_target){
@@ -59,7 +58,6 @@ const char* findCharBackwards(const char* _startHere, const char* _endHere, int 
 	}while(_startHere>_endHere);
 	return NULL;
 }
-
 char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
 	if (crossfeof(fp)){
 		return 1;
@@ -67,7 +65,6 @@ char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
 	*_numRead = crossfread(_destBuffer,1,_maxRead,fp);
 	return 0;
 }
-
 void lowCopyFile(const char* _srcPath, const char* _destPath, char _canMakeDirs){
 	crossFile _destfp = crossfopen(_destPath,"wb");
 	if (_destfp!=NULL){
@@ -123,12 +120,9 @@ void lowCopyFile(const char* _srcPath, const char* _destPath, char _canMakeDirs)
 		}
 	}
 }
-
 void copyFile(const char* _srcPath, const char* _destPath){
 	lowCopyFile(_srcPath,_destPath,1);
 }
-
-
 char* formatf(va_list _startedList, const char* _stringFormat){
 	va_list _doWriteArgs;
 	char* _completeString;
@@ -139,14 +133,12 @@ char* formatf(va_list _startedList, const char* _stringFormat){
 	va_end( _doWriteArgs ); // Even though it's a copy we still need to va_end it.
 	return _completeString;
 }
-
 char* easySprintf( const char* _stringFormat, ... ) {
 	va_list _tempArgs;
 	va_start(_tempArgs, _stringFormat);
 	char* _completeString = formatf(_tempArgs,_stringFormat);
 	return _completeString;
 }
-
 void seekPast(crossFile fp, unsigned char _target){
 	while (1){
 		int _lastRead = crossgetc(fp);
@@ -155,11 +147,9 @@ void seekPast(crossFile fp, unsigned char _target){
 		}
 	}
 }
-
 void seekNextLine(crossFile fp){
 	seekPast(fp,0x0A);
 }
-
 char* fancyReadLine(FILE* fp){
 	char* _tempReadLine = NULL;
 	size_t _tempReadLength = 0;
@@ -168,7 +158,6 @@ char* fancyReadLine(FILE* fp){
 	}
 	return _tempReadLine;
 }
-
 // todo - should this be in paths.c ?
 char* swapFilename(const char* _passedFilename, char* _newFilename){
 	int _cachedStrlenOrig = strlen(_passedFilename);
@@ -185,10 +174,27 @@ char* swapFilename(const char* _passedFilename, char* _newFilename){
 	_ret[i+_cachedStrlenNew+1]='\0';
 	return _ret;
 }
-
 #if GBPLAT == GB_ANDROID
 	// itoa replacement for android which only supports base 10
 	void itoa(int _num, char* _buffer, int _uselessBase){
 		sprintf(_buffer, "%d", _num);
 	}
 #endif
+char* easyCombineStrings(int _numStrings, ...){
+	va_list _tempArgs;
+	va_start(_tempArgs, _numStrings);
+	const char* _passedStrings[_numStrings];
+	int _totalLen=1;
+	int i;
+	for (i=0;i<_numStrings;++i){
+		_passedStrings[i]=va_arg(_tempArgs,const char*);
+		_totalLen+=strlen(_passedStrings[i]);
+	}
+	char* _retString = malloc(_totalLen);
+	_retString[0]='\0';
+	for (i=0;i<_numStrings;++i){
+		strcat(_retString,_passedStrings[i]);
+	}
+	va_end(_tempArgs);
+	return _retString;
+}
