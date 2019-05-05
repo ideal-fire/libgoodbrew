@@ -1,3 +1,13 @@
+How to compile for PS Vita
+------
+1. Compile & install libvita2dplusbloat: https://github.com/MyLegGuy/libvita2dplusbloat
+2. make -f makefile.vita clean
+3. make -f makefile.vita install
+
+How to compile for PC
+------
+make
+
 How to use bitmap fonts
 ------
 This can use bitmap fonts exported by the program fontbuilder. (https://github.com/andryblack/fontbuilder)
