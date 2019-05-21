@@ -1,4 +1,5 @@
 #include <goodbrew/config.h>
+#include <goodbrew/base.h>
 #include <goodbrew/graphics.h>
 #include <goodbrew/images.h>
 #include <stdio.h>
@@ -80,6 +81,18 @@ void initImages(){
 		IMG_Init( IMG_INIT_PNG );
 		IMG_Init( IMG_INIT_JPG );
 	#endif
+}
+crossTexture loadImage(const char* path){
+	crossFile fp=crossfopen(path,"rb");
+	unsigned char _magicStart = crossgetc(fp);
+	crossfclose(fp);
+	if (_magicStart==0x89){
+		return loadPNG(path);
+	}else if (_magicStart==0xFF){
+		return loadJPG(path);
+	}else{
+		return NULL;
+	}
 }
 crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D

@@ -43,7 +43,11 @@ void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, i
 		// If platform is Android, make the window fullscreen and store the screen size in the arguments.
 		#if GBPLAT == GB_ANDROID
 			SDL_DisplayMode displayMode;
-			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, displayMode.w, displayMode.h, SDL_WINDOW_SHOWN );
+			if (SDL_GetCurrentDisplayMode(0,&displayMode)==0){
+				mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, displayMode.w, displayMode.h, SDL_WINDOW_SHOWN );
+			}else{
+				SDL_Log("Failed to get display mode\n");
+			}
 			*_storeWindowWidth=displayMode.w;
 			*_storeWindowHeight=displayMode.h;
 		#else

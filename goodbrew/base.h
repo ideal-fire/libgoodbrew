@@ -53,7 +53,7 @@ enum corssFileSeekPoint{
 //////////////////////////////
 
 // Directory paths should end in a slash
-#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX
+#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	typedef DIR* crossDir;
 	typedef struct dirent* crossDirStorage;
 #elif GBPLAT == GB_VITA

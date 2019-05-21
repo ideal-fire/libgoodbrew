@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <goodbrew/config.h>
 #include <goodbrew/netCode.h>
 
 #if GBNET == GBNET_CURL
@@ -77,7 +78,9 @@ void gbNetDownloadToMem(const char* _passedUrl, char** _toStoreWebpageData, size
 	#endif
 }
 void gbNetDisableSSL(){
-	curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
+	#if GBNET == GBNET_CURL
+		curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
+	#endif
 }
 void gbNetSetReferer(const char* _newReferer){
 	#if GBNET == GBNET_CURL

@@ -1,6 +1,7 @@
 #ifndef GOODBREWNETINCLUDED_H
 #define GOODBREWNETINCLUDED_H
 
+#include <goodbrew/config.h>
 #if GBNET == GBNET_CURL
 	#include <curl/curl.h>
 #endif
