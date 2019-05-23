@@ -6,6 +6,10 @@
 #include <goodbrew/paths.h>
 #include <goodbrew/useful.h>
 
+#if GBPLAT == GB_WINDOWS
+	#include <windows.h> // for getting the data directory
+#endif
+
 char* gbDataFolder=NULL;
 
 // Passed string should be freed already

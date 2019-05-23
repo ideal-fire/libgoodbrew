@@ -63,9 +63,9 @@ void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, i
 			#endif
 		#endif
 		if (mainWindowRenderer==NULL){
-			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			if (mainWindowRenderer==NULL){
-				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED);
+				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, 0);
 			}
 		}
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
