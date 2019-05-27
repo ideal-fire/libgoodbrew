@@ -92,7 +92,14 @@ crossFont loadFont(const char* filename, double _passedSize){
 			// If the first byte is 0, that tells the program to load a different, special sfl format. For a regular sfl file, the first byte should never be 0 because the first byte should be part of the font name.
 			fread(&_firstByte,1,1,fp);
 			if (_firstByte!=0){ // If it's not the special format
-				seekNextLine(fp); // Seek past the rest of the font name
+				// Seek past the rest of the font name.
+				// Copy & pasted seek past next line code because we need to use regular IO instead of crossFile
+				while (1){
+					int _lastRead = fgetc(fp);
+					if (_lastRead==0x0A || _lastRead==EOF){
+						break;
+					}
+				}
 				fscanf(fp,"%hd %*hd\n",&_retBitmapFont->exportedSize); // Ignore the second number, the stored height, because it's too tall
 			}
 			// This is here because the special format and regular format share it

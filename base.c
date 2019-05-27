@@ -128,21 +128,14 @@ void createDirectory(const char* path){
 #endif
 char dirOpenWorked(crossDir passedir){
 	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
-		if (passedir==NULL){
-			return 0;
-		}
+		return !(passedir==NULL);
 	#elif GBPLAT == GB_VITA
-		if (passedir<0){
-			return 0;
-		}
+		return (passedir>=0);
 	#elif GBPLAT == GB_3DS
-		if (passedir==0){
-			return 0;
-		}
+		return (passedir!=0);
 	#else
 		return 0;
 	#endif
-	return 1;
 }
 crossDir openDirectory(const char* filepath){
 	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
