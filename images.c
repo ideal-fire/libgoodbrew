@@ -98,10 +98,7 @@ crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_PNG_buffer(_passedBuffer);
 	#elif GBREND == GBREND_SDL
-		SDL_RWops* _passedBufferRW = SDL_RWFromMem(_passedBuffer, _passedBufferSize);
-		SDL_Surface* _tempSurface = IMG_LoadPNG_RW(_passedBufferRW);
-		SDL_RWclose(_passedBufferRW);
-		return surfaceToTexture(_tempSurface);
+		return surfaceToTexture(IMG_Load_RW(SDL_RWFromMem(_passedBuffer,_passedBufferSize),1));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_buffer(_passedBuffer,SF2D_PLACE_RAM);
 	#endif
@@ -110,10 +107,7 @@ crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_JPEG_buffer(_passedBuffer,_passedBufferSize);
 	#elif GBREND == GBREND_SDL
-		SDL_RWops* _passedBufferRW = SDL_RWFromMem(_passedBuffer, _passedBufferSize);
-		SDL_Surface* _tempSurface = IMG_LoadJPG_RW(_passedBufferRW);
-		SDL_RWclose(_passedBufferRW);
-		return surfaceToTexture(_tempSurface);
+		return loadPNGBuffer(_passedBuffer, _passedBufferSize);
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_JPEG_buffer(_passedBuffer,_passedBufferSize,SF2D_PLACE_RAM);
 	#endif
@@ -122,8 +116,7 @@ crossTexture loadPNG(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_PNG_file(path);
 	#elif GBREND == GBREND_SDL
-		SDL_Surface* _tempSurface = IMG_Load(path);
-		return surfaceToTexture(_tempSurface);
+		return surfaceToTexture(IMG_Load(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
 	#endif
