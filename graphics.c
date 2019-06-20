@@ -42,31 +42,31 @@ void setWindowTitle(char* _newTitle){
 		SDL_SetWindowTitle(mainWindow,_newTitle);
 	#endif
 }
-void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, int* _storeWindowHeight){
+void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 	#if GBREND == GBREND_SDL
 		SDL_Init(SDL_INIT_VIDEO);
 		mainWindowRenderer=NULL;
-		// If platform is Android, make the window fullscreen and store the screen size in the arguments.
-		#if GBPLAT == GB_ANDROID
+		//
+		if (GBPLAT==GB_ANDROID || _passedFlags & WINDOWFLAG_FULLSCREEN){
 			SDL_DisplayMode displayMode;
 			if (SDL_GetCurrentDisplayMode(0,&displayMode)==0){
-				mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, displayMode.w, displayMode.h, SDL_WINDOW_SHOWN );
+				_windowWidth=displayMode.w;
+				_windowHeight=displayMode.h;
 			}else{
 				SDL_Log("Failed to get display mode\n");
+				return;
 			}
-			*_storeWindowWidth=displayMode.w;
-			*_storeWindowHeight=displayMode.h;
+		}
+		#if GBPLAT == GB_SWITCH
+			// For some reason, the other code doesn't work. I have to do it this way.
+			windowWidth=1280;
+			windowHeight=720;
+			SDL_CreateWindowAndRenderer(windowWidth, windowHeight, 0, &mainWindow, &mainWindowRenderer);
 		#else
-			#if GBPLAT == GB_SWITCH
-				// For some reason, the other code doesn't work. I have to do it this way.
-				SDL_CreateWindowAndRenderer(1280, 720, 0, &mainWindow, &mainWindowRenderer);
-				*_storeWindowWidth=1280;
-				*_storeWindowHeight=720;
-			#else
-				mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN );
-				*_storeWindowWidth=_windowWidth;
-				*_storeWindowHeight=_windowHeight;
-			#endif
+			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN);
+			if (_passedFlags & WINDOWFLAG_RESIZABLE){
+				SDL_SetWindowResizable(mainWindow,SDL_TRUE);
+			}
 		#endif
 		if (mainWindowRenderer==NULL){
 			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -76,7 +76,7 @@ void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, i
 		}
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 		SDL_SetRenderDrawBlendMode(mainWindowRenderer,SDL_BLENDMODE_BLEND);
-		#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX
+		/*#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX
 			// Set a solid white icon.
 			SDL_Surface* tempIconSurface;
 			Uint16* _surfacePixels = malloc(sizeof(Uint16)*16*16);
@@ -90,20 +90,20 @@ void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, i
 			SDL_SetWindowIcon(mainWindow, tempIconSurface);
 			SDL_FreeSurface(tempIconSurface);
 			free(_surfacePixels);
-		#endif
+			#endif*/
 	#elif GBREND == GBREND_VITA2D
 		vita2d_init();
-		*_storeWindowWidth=960;
-		*_storeWindowHeight=544;
+		_windowWidth=960;
+		_windowHeight=544;
 	#elif GBREND == GBREND_SF2D
 		sf2d_init();
-		*_storeWindowWidth=400;
-		*_storeWindowHeight=240;
+		_windowWidth=400;
+		_windowHeight=240;
 	#else
 		#error Forgot to make graphics init function
 	#endif
-	_goodbrewRealScreenWidth = *_storeWindowWidth;
-	_goodbrewRealScreenHeight = *_storeWindowHeight;
+	_goodbrewRealScreenWidth = _windowWidth;
+	_goodbrewRealScreenHeight = _windowHeight;
 }
 void startDrawing(){
 	#if GBREND == GBREND_VITA2D

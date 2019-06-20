@@ -9,6 +9,9 @@
 	#define EASYFIXCOORDS(x,y)
 #endif
 
+#define WINDOWFLAG_FULLSCREEN 1
+#define WINDOWFLAG_RESIZABLE 2
+
 extern int _goodbrewRealScreenWidth;
 extern int _goodbrewRealScreenHeight;
 
@@ -18,8 +21,8 @@ void endDrawing();
 void FixCoords(int* _x, int* _y);
 int getScreenHeight();
 int getScreenWidth();
-// _windowWidth and _windowHeight are recommendations for the Window size. Will be ignored on many platforms
-void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, int* _storeWindowHeight);
+// _windowWidth and _windowHeight are recommendations for the Window size. Will be ignored on many platforms. Need to use getScreenWidth and getScreenHeight after calling.
+void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags);
 void quitGraphics();
 void setClearColor(int r, int g, int b);
 void setWindowTitle(char* _newTitle);
