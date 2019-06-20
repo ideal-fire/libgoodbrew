@@ -38,74 +38,92 @@ int fixButtonAlias(int _passedButton){
 }
 
 #if GBREND == GBREND_SDL
-	void _readSDLControls(){
-		lastSDLPressedKey=SDLK_UNKNOWN;
-		memcpy(currentPad,lastPad,sizeof(currentPad));
-		SDL_Event e;
-		while(SDL_PollEvent(&e)!=0){
-			if (e.type == SDL_QUIT){
-				XOutFunction();
-			}else if (e.type == SDL_MOUSEWHEEL){
-				mouseScroll = e.wheel.y;
-				currentPad[BUTTON_SCROLL]=1;
-			}else if(e.type == SDL_KEYDOWN || e.type == SDL_KEYUP){
-				char _isDown;
-				if (_isDown=(e.type == SDL_KEYDOWN)){
-					lastSDLPressedKey = e.key.keysym.sym;
-				}
-				if (e.key.keysym.sym==SDLK_x){
-					currentPad[BUTTON_A]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_z){
-					currentPad[BUTTON_B]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_LEFT){
-					currentPad[BUTTON_LEFT]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_RIGHT){
-					currentPad[BUTTON_RIGHT]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_DOWN){
-					currentPad[BUTTON_DOWN]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_UP){
-					currentPad[BUTTON_UP]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_a){
-					currentPad[BUTTON_Y]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_s){
-					currentPad[BUTTON_X]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_ESCAPE || e.key.keysym.sym==SDLK_RETURN){
-					currentPad[BUTTON_START]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_e){
-					currentPad[BUTTON_SELECT]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_b || e.key.keysym.sym==SDLK_AC_BACK){
-					currentPad[BUTTON_BACK]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_l){
-					currentPad[BUTTON_L]=_isDown;
-				}else if (e.key.keysym.sym==SDLK_r){
-					currentPad[BUTTON_R]=_isDown;
-				}
-			}else if( e.type == SDL_FINGERDOWN || (currentPad[BUTTON_TOUCH]==1 && e.type == SDL_FINGERMOTION)){
-				touchX = e.tfinger.x * _goodbrewRealScreenWidth;
-				touchY = e.tfinger.y * _goodbrewRealScreenHeight;
-				currentPad[BUTTON_TOUCH]=1;
-				lastClickWasRight=0;
-			}else if (e.type == SDL_MOUSEBUTTONDOWN){ // Initial click
-				SDL_GetMouseState(&touchX,&touchY);
-				currentPad[BUTTON_TOUCH] = 1;
-				if (e.button.button==SDL_BUTTON_RIGHT){
-					lastClickWasRight=1;
-				}else{
-					lastClickWasRight=0;
-				}
-			}else if (e.type == SDL_MOUSEMOTION && currentPad[BUTTON_TOUCH]==1){ // Click and drag
-				SDL_GetMouseState(&touchX,&touchY);
-				currentPad[BUTTON_TOUCH] = 1;
-			}else if (e.type == SDL_FINGERUP){
-				currentPad[BUTTON_TOUCH] = 0;
-			}else if (e.type == SDL_MOUSEBUTTONUP){
-				currentPad[BUTTON_TOUCH] = 0;
-			}else if (e.type==SDL_WINDOWEVENT_SIZE_CHANGED){
+void _readSDLControls(){
+	lastSDLPressedKey=SDLK_UNKNOWN;
+	currentPad[BUTTON_RESIZE]=0;
+	SDL_Event e;
+	while(SDL_PollEvent(&e)!=0){
+		switch(e.type){
+		case SDL_QUIT:
+			XOutFunction();
+			break;
+		case SDL_MOUSEWHEEL:
+			mouseScroll=e.wheel.y;
+			currentPad[BUTTON_SCROLL]=1;
+			break;
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+			;
+			char _isDown;
+			if (_isDown=(e.type == SDL_KEYDOWN)){
+				lastSDLPressedKey = e.key.keysym.sym;
+			}
+			if (e.key.keysym.sym==SDLK_x){
+				currentPad[BUTTON_A]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_z){
+				currentPad[BUTTON_B]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_LEFT){
+				currentPad[BUTTON_LEFT]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_RIGHT){
+				currentPad[BUTTON_RIGHT]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_DOWN){
+				currentPad[BUTTON_DOWN]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_UP){
+				currentPad[BUTTON_UP]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_a){
+				currentPad[BUTTON_Y]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_s){
+				currentPad[BUTTON_X]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_ESCAPE || e.key.keysym.sym==SDLK_RETURN){
+				currentPad[BUTTON_START]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_e){
+				currentPad[BUTTON_SELECT]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_b || e.key.keysym.sym==SDLK_AC_BACK){
+				currentPad[BUTTON_BACK]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_l){
+				currentPad[BUTTON_L]=_isDown;
+			}else if (e.key.keysym.sym==SDLK_r){
+				currentPad[BUTTON_R]=_isDown;
+			}
+			break;
+		case SDL_FINGERMOTION:
+			if (!currentPad[BUTTON_TOUCH]){
+				break;
+			}
+		case SDL_FINGERDOWN:
+			touchX = e.tfinger.x * _goodbrewRealScreenWidth;
+			touchY = e.tfinger.y * _goodbrewRealScreenHeight;
+			currentPad[BUTTON_TOUCH]=1;
+			lastClickWasRight=0;
+			break;
+		case SDL_MOUSEBUTTONDOWN: // Initial click
+			SDL_GetMouseState(&touchX,&touchY);
+			currentPad[BUTTON_TOUCH] = 1;
+			lastClickWasRight = (e.button.button==SDL_BUTTON_RIGHT);
+			break;
+		case SDL_MOUSEMOTION: // Click and drag
+			if (!currentPad[BUTTON_TOUCH]){
+				break;
+			}
+			SDL_GetMouseState(&touchX,&touchY);
+			currentPad[BUTTON_TOUCH] = 1;
+			break;
+		case SDL_FINGERUP:
+			currentPad[BUTTON_TOUCH] = 0;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			currentPad[BUTTON_TOUCH] = 0;
+			break;
+		case SDL_WINDOWEVENT:
+			if (e.window.event==SDL_WINDOWEVENT_SIZE_CHANGED){
 				_goodbrewRealScreenWidth=e.window.data1;
 				_goodbrewRealScreenHeight=e.window.data2;
+				currentPad[BUTTON_RESIZE]=1;
 			}
+			break;
 		}
 	}
+}
 #endif
 
 // It's easiest to do controls this way. There are different ways of storing and reading controls and this makes them all compatible easily.

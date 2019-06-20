@@ -16,6 +16,8 @@ void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b); // Ass
 void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a);
 void endDrawing();
 void FixCoords(int* _x, int* _y);
+int getScreenHeight();
+int getScreenWidth();
 // _windowWidth and _windowHeight are recommendations for the Window size. Will be ignored on many platforms
 void initGraphics(int _windowWidth, int _windowHeight, int* _storeWindowWidth, int* _storeWindowHeight);
 void quitGraphics();

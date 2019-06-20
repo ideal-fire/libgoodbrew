@@ -17,6 +17,7 @@ typedef enum{
 	BUTTON_TOUCH, // Use touchX, touchY variables
 	BUTTON_SCROLL, // PC, use mouseScroll variable
 	BUTTON_BACK, // Android
+	BUTTON_RESIZE, // On window resize. Use getWindowWidth and getWindowHeight
 
 
 	NUMBUTTONS
