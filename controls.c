@@ -42,18 +42,15 @@ int fixButtonAlias(int _passedButton){
 		lastSDLPressedKey=SDLK_UNKNOWN;
 		memcpy(currentPad,lastPad,sizeof(currentPad));
 		SDL_Event e;
-		while( SDL_PollEvent( &e ) != 0 ){
-			if( e.type == SDL_QUIT ){
+		while(SDL_PollEvent(&e)!=0){
+			if (e.type == SDL_QUIT){
 				XOutFunction();
-			}
-			if(e.type == SDL_MOUSEWHEEL){
+			}else if (e.type == SDL_MOUSEWHEEL){
 				mouseScroll = e.wheel.y;
 				currentPad[BUTTON_SCROLL]=1;
-			}
-			if( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP){
-				char _isDown = 0;
-				if (e.type == SDL_KEYDOWN){
-					_isDown=1;
+			}else if(e.type == SDL_KEYDOWN || e.type == SDL_KEYUP){
+				char _isDown;
+				if (_isDown=(e.type == SDL_KEYDOWN)){
 					lastSDLPressedKey = e.key.keysym.sym;
 				}
 				if (e.key.keysym.sym==SDLK_x){
@@ -83,9 +80,7 @@ int fixButtonAlias(int _passedButton){
 				}else if (e.key.keysym.sym==SDLK_r){
 					currentPad[BUTTON_R]=_isDown;
 				}
-			}
-			
-			if( e.type == SDL_FINGERDOWN || (currentPad[BUTTON_TOUCH]==1 && e.type == SDL_FINGERMOTION)){
+			}else if( e.type == SDL_FINGERDOWN || (currentPad[BUTTON_TOUCH]==1 && e.type == SDL_FINGERMOTION)){
 				touchX = e.tfinger.x * _goodbrewRealScreenWidth;
 				touchY = e.tfinger.y * _goodbrewRealScreenHeight;
 				currentPad[BUTTON_TOUCH]=1;
@@ -101,11 +96,13 @@ int fixButtonAlias(int _passedButton){
 			}else if (e.type == SDL_MOUSEMOTION && currentPad[BUTTON_TOUCH]==1){ // Click and drag
 				SDL_GetMouseState(&touchX,&touchY);
 				currentPad[BUTTON_TOUCH] = 1;
-			}
-			if (e.type == SDL_FINGERUP){
+			}else if (e.type == SDL_FINGERUP){
 				currentPad[BUTTON_TOUCH] = 0;
 			}else if (e.type == SDL_MOUSEBUTTONUP){
 				currentPad[BUTTON_TOUCH] = 0;
+			}else if (e.type==SDL_WINDOWEVENT_SIZE_CHANGED){
+				_goodbrewRealScreenWidth=e.window.data1;
+				_goodbrewRealScreenHeight=e.window.data2;
 			}
 		}
 	}

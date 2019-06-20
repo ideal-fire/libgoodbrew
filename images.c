@@ -167,7 +167,7 @@ int getTextureHeight(const crossTexture passedTexture){
 		return passedTexture->height;
 	#endif
 }
-// Simple
+// Zero modifiers
 void drawTexture(const crossTexture passedTexture, int destX, int destY){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
@@ -178,6 +178,7 @@ void drawTexture(const crossTexture passedTexture, int destX, int destY){
 		//sf2d_draw_texture(passedTexture,_destX,_destY);
 	#endif
 }
+// One modifier
 void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
@@ -201,7 +202,7 @@ void drawTextureAlpha(const crossTexture passedTexture, int destX, int destY, un
 void drawTextureScaled(const crossTexture passedTexture, int destX, int destY, double _scaleFactor){
 	drawTextureSized(passedTexture,destX,destY,getTextureWidth(passedTexture)*_scaleFactor,getTextureHeight(passedTexture)*_scaleFactor);
 }
-// Less simple
+// Two modifiers
 void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
@@ -232,7 +233,7 @@ void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(r,g,b,255));
 	#endif
 }
-// Even less simple
+// All four modifiers
 void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D

@@ -31,6 +31,12 @@
 int _goodbrewRealScreenWidth=1;
 int _goodbrewRealScreenHeight=1;
 
+int getScreenWidth(){
+	return _goodbrewRealScreenWidth;
+}
+int getScreenHeight(){
+	return _goodbrewRealScreenHeight;
+}
 void setWindowTitle(char* _newTitle){
 	#if GBREND == GBREND_SDL
 		SDL_SetWindowTitle(mainWindow,_newTitle);
