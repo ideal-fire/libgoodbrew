@@ -136,8 +136,7 @@ char* formatf(va_list _startedList, const char* _stringFormat){
 char* easySprintf( const char* _stringFormat, ... ) {
 	va_list _tempArgs;
 	va_start(_tempArgs, _stringFormat);
-	char* _completeString = formatf(_tempArgs,_stringFormat);
-	return _completeString;
+	return formatf(_tempArgs,_stringFormat);
 }
 void seekPast(crossFile fp, unsigned char _target){
 	while (1){
@@ -165,9 +164,19 @@ char* swapFilename(const char* _passedFilename, char* _newFilename){
 	char* _ret = malloc(_cachedStrlenOrig+strlen(_newFilename)+1);
 	int i;
 	for (i=_cachedStrlenOrig-1;i>=0;--i){
-		if (_passedFilename[i]=='/' || _passedFilename[i]=='\\'){
-			break;
-		}
+		#if GBPLAT == GB_WINDOWS
+			if (_passedFilename[i]=='\\'){
+				break;
+			}
+		#elif GBPLAT == GB_VITA
+			if (_passedFilename[i]=='/' || _passedFilename[i]==':'){
+				break;
+			}
+		#else
+			if (_passedFilename[i]=='/'){
+				break;
+			}
+		#endif
 	}
 	memcpy(_ret,_passedFilename,i+1); // 
 	memcpy(&(_ret[i+1]),_newFilename,_cachedStrlenNew);
