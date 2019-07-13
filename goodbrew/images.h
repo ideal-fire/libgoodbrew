@@ -14,14 +14,16 @@
 	typedef sf2d_texture* crossTexture;
 #endif
 
+void drawTexture(const crossTexture passedTexture, int destX, int destY); //
+void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH); //
 void drawTextureAlpha(const crossTexture passedTexture, int destX, int destY, unsigned char alpha);
-void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a);
-void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH);
 void drawTextureScaled(const crossTexture passedTexture, int destX, int destY, double _scaleFactor);
+void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH); //
 void drawTextureSizedAlpha(const crossTexture passedTexture, int destX, int destY, int partW, int partH, unsigned char alpha);
 void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b);
-void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH);
-void drawTexture(const crossTexture passedTexture, int destX, int destY);
+void drawTexturePartSizedAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha); //
+void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a); //
+
 void freeTexture(crossTexture passedTexture);
 int getTextureHeight(const crossTexture passedTexture);
 int getTextureWidth(const crossTexture passedTexture);

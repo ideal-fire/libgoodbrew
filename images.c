@@ -233,6 +233,17 @@ void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(r,g,b,255));
 	#endif
 }
+// Three modifiers
+void drawTexturePartSizedAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha){
+	EASYFIXCOORDS(&destX,&destY);
+	#if GBREND == GBREND_VITA2D
+		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(255,255,255,alpha));
+	#elif GBREND == GBREND_SDL
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,alpha,1,0);
+	#elif GBREND == GBREND_SF2D
+		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
+	#endif
+}
 // All four modifiers
 void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a){
 	EASYFIXCOORDS(&destX,&destY);
