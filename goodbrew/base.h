@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #if GBREND == GBREND_SDL
 	#include <SDL2/SDL.h> // For file functions
