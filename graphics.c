@@ -189,3 +189,27 @@ void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b){
 	_drawRectangle(0,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
 	_drawRectangle(_goodbrewRealScreenWidth-_halfWastedHeight,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
 }
+
+void enableClipping(int x, int y, int w, int h){
+	#if GBREND == GBREND_VITA2D
+		vita2d_enable_clipping(x,y,x+w,y+h);
+	#elif GBREND == GBREND_SDL
+		SDL_Rect _passedRegion;
+		_passedRegion.x=x;
+		_passedRegion.y=y;
+		_passedRegion.w=w;
+		_passedRegion.h=h;
+		SDL_RenderSetClipRect(mainWindowRenderer,&_passedRegion);
+	#elif GBREND == GBREND_SF2D
+		// Not supported
+	#endif
+}
+void disableClipping(){
+	#if GBREND == GBREND_VITA2D
+		vita2d_disable_clipping();
+	#elif GBREND == GBREND_SDL
+		SDL_RenderSetClipRect(mainWindowRenderer,NULL);
+	#elif GBREND == GBREND_SF2D
+		// Not supported
+	#endif
+}

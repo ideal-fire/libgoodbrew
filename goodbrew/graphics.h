@@ -30,4 +30,6 @@ void startDrawingBottom();
 void startDrawing();
 void FixCoords(int* _x, int* _y);
 void initImages();
+void enableClipping(int x, int y, int w, int h);
+void disableClipping();
 #endif // GOODBREWGRAPHICSINCLUDED_H
