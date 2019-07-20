@@ -1,5 +1,8 @@
 #ifndef GOODBREWBASEHINCLUDED
 #define GOODBREWBASEHINCLUDED
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <stdio.h>
@@ -96,4 +99,8 @@ void removeNewline(char* _toRemove);
 void utf2ascii(char* dst, u16* src);
 void wait(int miliseconds);
 
+#ifdef __cplusplus
+}
+#endif
+	
 #endif

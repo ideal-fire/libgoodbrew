@@ -1,5 +1,9 @@
 #ifndef GOODBREWTEXTINCLUDED_H
 #define GOODBREWTEXTINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define BITMAP_FONT_FAKE_SIZE 28
 
@@ -19,4 +23,7 @@ crossFont loadFont(const char* filename, double _passedSize);
 int textHeight(crossFont _passedFont);
 int textWidth(crossFont _passedFont, const char* message);
 
+#ifdef __cplusplus
+}
+#endif
 #endif // GOODBREWTEXTINCLUDED_H

@@ -1,5 +1,8 @@
 #ifndef GOODBREWUSEFULSTUFFINCLUDED_H
 #define GOODBREWUSEFULSTUFFINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -18,5 +21,8 @@ char* easyCombineStrings(int _numStrings, ...);
 #if !(_POSIX_C_SOURCE >= 200809L)
 	ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 	ssize_t getline(char** lineptr, size_t* n, FILE* stream);
+#endif
+#ifdef __cplusplus
+}
 #endif
 #endif

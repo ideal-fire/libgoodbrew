@@ -1,5 +1,9 @@
 #ifndef GOODBREWCONTROLSINCLUDED_H
 #define GOODBREWCONTROLSINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef enum{
 	BUTTON_A = 1,
@@ -42,4 +46,8 @@ extern int touchY;
 	extern char lastClickWasRight;
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+	
 #endif

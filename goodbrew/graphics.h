@@ -1,6 +1,10 @@
 #ifndef GOODBREWGRAPHICSINCLUDED_H
 #define GOODBREWGRAPHICSINCLUDED_H
- 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #if DOFIXCOORDS == 1
 	int fixX(int x);
 	int fixY(int y);
@@ -32,4 +36,7 @@ void FixCoords(int* _x, int* _y);
 void initImages();
 void enableClipping(int x, int y, int w, int h);
 void disableClipping();
+	#ifdef __cplusplus
+}
+#endif
 #endif // GOODBREWGRAPHICSINCLUDED_H

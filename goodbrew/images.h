@@ -1,5 +1,9 @@
 #ifndef GOODBREWIMAGESINCLUDED_H
 #define GOODBREWIMAGESINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #if GBREND == GBREND_SDL
 	#include <SDL2/SDL.h>
@@ -33,5 +37,7 @@ crossTexture loadJPG(const char* path);
 crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadPNG(const char* path);
 crossTexture loadImage(const char* path);
-
+#ifdef __cplusplus
+}
+#endif
 #endif /* GOODBREWIMAGESINCLUDED_H */

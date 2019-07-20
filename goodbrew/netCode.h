@@ -1,5 +1,9 @@
 #ifndef GOODBREWNETINCLUDED_H
 #define GOODBREWNETINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include <goodbrew/config.h>
 #if GBNET == GBNET_CURL
@@ -17,5 +21,7 @@ void gbNetFollowRedirects(char _isEnabled);
 char *gbNetGetLastRedirect();
 char gbNetInit(const char *_certLocation);
 
- 
+#ifdef __cplusplus
+}
+#endif 
 #endif

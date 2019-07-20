@@ -1,5 +1,9 @@
 #ifndef GOODBREWPATHSINCLUDED_H
 #define GOODBREWPATHSINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef enum{
 	TYPE_DATA,
@@ -20,4 +24,7 @@ signed char generateDefaultDataDirectory(char** _dataDirPointer, signed char _da
 char* getFixPathString(fileLocationType type);
 void makeDataDirectory();
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* GOODBREWPATHSINCLUDED_H */

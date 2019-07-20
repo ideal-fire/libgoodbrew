@@ -1,5 +1,8 @@
 #ifndef LIBGOODBREWSOUNDINCLUDED_H
 #define LIBGOODBREWSOUNDINCLUDED_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 #if GBSND == GBSND_SDL
@@ -52,4 +55,7 @@ void setSFXVolume(crossPlayHandle tochange, int toval);
 void stopMusic(crossPlayHandle toStop);
 void stopSound(crossSE toStop);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
