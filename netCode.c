@@ -123,9 +123,6 @@ char* gbNetGetLastRedirect(){
 	#endif
 }
 char gbNetInit(const char* _certLocation){
-	if (_certLocation==NULL){
-		printf("Allowing insecure connections\n");
-	}
 	#if GBNET == GBNET_CURL
 		if (curl_global_init(CURL_GLOBAL_ALL)!=0){
 			return 1;

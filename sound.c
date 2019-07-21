@@ -142,7 +142,7 @@ crossSE loadSound(char* filepath){
 	#elif GBSND == GBSND_VITA
 		return _mlgsnd_loadAudioFilename(filepath,0,1);
 	#elif GBSND == SND_NONE
-		return NULL;
+		return 0;
 	#endif
 }
 crossMusic loadMusic(char* filepath){
@@ -159,7 +159,7 @@ crossMusic loadMusic(char* filepath){
 	#elif GBSND == GBSND_VITA
 		return mlgsnd_loadMusicFilename(filepath);
 	#elif GBSND == SND_NONE
-		return NULL;
+		return 0;
 	#endif
 }
 void stopMusic(crossPlayHandle toStop){
