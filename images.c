@@ -82,17 +82,38 @@ void initImages(){
 		IMG_Init( IMG_INIT_JPG );
 	#endif
 }
+// 0 - unknown
+// 1 - png
+// 2 - jpg
+static char getImageType(char _magicStart){
+	if (_magicStart==0x89){
+		return 1;
+	}else if (_magicStart==0xFF){
+		return 2;
+	}else{
+		return 0;
+	}
+}
+crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
+	switch(getImageType(((char*)_passedBuffer)[0])){
+		case 1:
+			return loadPNGBuffer(_passedBuffer,_passedBufferSize);
+		case 2:
+			return loadJPGBuffer(_passedBuffer,_passedBufferSize);
+	}
+	return NULL;
+}
 crossTexture loadImage(const char* path){
 	crossFile fp=crossfopen(path,"rb");
 	unsigned char _magicStart = crossgetc(fp);
 	crossfclose(fp);
-	if (_magicStart==0x89){
-		return loadPNG(path);
-	}else if (_magicStart==0xFF){
-		return loadJPG(path);
-	}else{
-		return NULL;
+	switch(_magicStart){
+		case 1:
+			return loadPNG(path);
+		case 2:
+			return loadJPG(path);
 	}
+	return NULL;
 }
 crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D

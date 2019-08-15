@@ -36,6 +36,7 @@ crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadJPG(const char* path);
 crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadPNG(const char* path);
+crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize);
 crossTexture loadImage(const char* path);
 #ifdef __cplusplus
 }
