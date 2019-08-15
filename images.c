@@ -85,7 +85,7 @@ void initImages(){
 // 0 - unknown
 // 1 - png
 // 2 - jpg
-static char getImageType(char _magicStart){
+static char getImageType(unsigned char _magicStart){
 	if (_magicStart==0x89){
 		return 1;
 	}else if (_magicStart==0xFF){
@@ -107,7 +107,7 @@ crossTexture loadImage(const char* path){
 	crossFile fp=crossfopen(path,"rb");
 	unsigned char _magicStart = crossgetc(fp);
 	crossfclose(fp);
-	switch(_magicStart){
+	switch(getImageType(_magicStart)){
 		case 1:
 			return loadPNG(path);
 		case 2:
