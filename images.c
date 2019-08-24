@@ -266,7 +266,7 @@ void drawTexturePartSizedAlpha(const crossTexture passedTexture, int destX, int 
 	#endif
 }
 // All four modifiers
-void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a){
+void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(r,g,b,a));
