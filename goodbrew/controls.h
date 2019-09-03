@@ -30,11 +30,17 @@ typedef enum{
 void controlsEnd();
 void controlsStart();
 #define controlsReset() controlsStart(); controlsEnd();
-int fixButtonAlias(int _passedButton);
+int fixButtonAlias(crossButton _passedButton);
 char isDown(crossButton _passedButton);
 char wasJustPressed(crossButton _passedButton);
 char wasJustReleased(crossButton _passedButton);
-
+char wasIsDown(crossButton _passedButton); // if button was down last frame or this frame
+// These four are risky. When using SDL, the button won't go up by itself.
+void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus);
+void setJustPressed(crossButton _passedButton);
+void setDown(crossButton _passedButton);
+void setJustReleased(crossButton _passedButton);
+	
 extern int touchX;
 extern int touchY;
 

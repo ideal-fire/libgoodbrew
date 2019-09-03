@@ -29,18 +29,29 @@ char buttonAlias[NUMBUTTONS];
 #define TOBOOL(x) ((x)>0)
 
 //////////////////////////////////////////////////////////
-
-int fixButtonAlias(int _passedButton){
+int fixButtonAlias(crossButton _passedButton){
 	if (buttonAlias[_passedButton]!=0){
 		return buttonAlias[_passedButton];
 	}
 	return _passedButton;
 }
-
+void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
+	crossButton _realButton = fixButtonAlias(_passedButton);
+	currentPad[_realButton]=_newCurStatus;
+	lastPad[_realButton]=_newLastStatus;
+}
+void setJustPressed(crossButton _passedButton){
+	lowSetButtonState(_passedButton,1,0);
+}
+void setDown(crossButton _passedButton){
+	lowSetButtonState(_passedButton,1,1);
+}
+void setJustReleased(crossButton _passedButton){
+	lowSetButtonState(_passedButton,0,1);
+}
 #if GBREND == GBREND_SDL
 void _readSDLControls(){
 	lastSDLPressedKey=SDLK_UNKNOWN;
-	currentPad[BUTTON_RESIZE]=0;
 	SDL_Event e;
 	while(SDL_PollEvent(&e)!=0){
 		switch(e.type){
@@ -125,10 +136,10 @@ void _readSDLControls(){
 	}
 }
 #endif
-
 // It's easiest to do controls this way. There are different ways of storing and reading controls and this makes them all compatible easily.
 void controlsStart(){
 	// TODO - Work on touch for homebrew systems
+	currentPad[BUTTON_RESIZE]=0;
 	#if GBPLAT == GB_VITA
 		SceCtrlData _pad;
 		sceCtrlPeekBufferPositive(0, &_pad, 1);
@@ -183,19 +194,23 @@ void controlsStart(){
 		#warning no control code for this setup
 	#endif
 }
-
 void controlsEnd(){
 	memcpy(lastPad,currentPad,sizeof(currentPad));
 }
-
 char wasJustReleased(crossButton _passedButton){
-	return lastPad[fixButtonAlias(_passedButton)] && !currentPad[fixButtonAlias(_passedButton)];
+	crossButton _aliased = fixButtonAlias(_passedButton);
+	return lastPad[_aliased] && !currentPad[_aliased];
 }
 char wasJustPressed(crossButton _passedButton){
-	return !lastPad[fixButtonAlias(_passedButton)] && currentPad[fixButtonAlias(_passedButton)];
+	crossButton _aliased = fixButtonAlias(_passedButton);
+	return !lastPad[_aliased] && currentPad[_aliased];
 }
 char isDown(crossButton _passedButton){
 	return currentPad[fixButtonAlias(_passedButton)];
+}
+char wasIsDown(crossButton _passedButton){
+	crossButton _aliased = fixButtonAlias(_passedButton);
+	return currentPad[_aliased] || lastPad[_aliased];
 }
 
 #define controlsReset() \
