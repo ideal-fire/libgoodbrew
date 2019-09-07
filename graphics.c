@@ -1,4 +1,5 @@
 #include <goodbrew/config.h>
+#include <goodbrew/base.h>
 #include <goodbrew/graphics.h>
 
 #if DOFIXCOORDS == 1
@@ -105,12 +106,18 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 	_goodbrewRealScreenWidth = _windowWidth;
 	_goodbrewRealScreenHeight = _windowHeight;
 }
+#if CAPHUGEFPS == 1
+	static u64 _goodbrewFrameStartTime;
+#endif
 void startDrawing(){
 	#if GBREND == GBREND_VITA2D
 		vita2d_start_drawing();
 		vita2d_clear_screen();
 	#elif GBREND == GBREND_SDL
 		SDL_RenderClear(mainWindowRenderer);
+		#if CAPHUGEFPS == 1
+			_goodbrewFrameStartTime = getMilli();
+		#endif
 	#elif GBREND == GBREND_SF2D
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	#endif
@@ -123,6 +130,12 @@ void endDrawing(){
 		vita2d_wait_rendering_done();
 	#elif GBREND == GBREND_SDL
 		SDL_RenderPresent(mainWindowRenderer);
+		// this is the only one that may not limit to 60 fps
+		#if CAPHUGEFPS == 1
+			if (getMilli()-_goodbrewFrameStartTime==0){
+				wait(1);
+			}
+		#endif	
 	#elif GBREND == GBREND_SF2D
 		sf2d_end_frame();
 		sf2d_swapbuffers();

@@ -40,10 +40,13 @@
 	#error Could not get platform
 #endif
 
-// If true, define
+// If 1, define
 //	int fixX(int x)
 //	int fixY(int y)
 #define DOFIXCOORDS 1
+
+// if 1, wait 1 millisecond at the end of the frame if it took less than a millisecond.
+#define CAPHUGEFPS 0
 
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	#define GBREND GBREND_SDL
