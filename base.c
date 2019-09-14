@@ -363,7 +363,7 @@ long int crossftell(crossFile fp){
 }
 // No platform specific code here
 int crossgetc(crossFile fp){
-	char _readChar;
+	unsigned char _readChar;
 	if (crossfread(&_readChar,1,1,fp)==0){
 		return EOF;
 	}
