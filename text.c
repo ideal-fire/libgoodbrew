@@ -84,23 +84,18 @@ crossFont loadFont(const char* filename, double _passedSize){
 	if (_cachedstrlen>=4 && strcmp(&(filename[_cachedstrlen-4]),".sfl")==0){
 		_retFont->type = GBTXT_BITMAP;
 		//https://github.com/andryblack/fontbuilder/blob/24459633c531f2316c7c3eed1fee5ef87ac8bda0/src/exporters/simpleexporter.cpp
-		FILE* fp = fopen(filename,"r");
+		crossFile fp = crossfopen(filename,"r");
 		if (fp!=NULL){
 			struct loadedBitmapFont* _retBitmapFont = malloc(sizeof(struct loadedBitmapFont));
 
 			char _firstByte;
 			// If the first byte is 0, that tells the program to load a different, special sfl format. For a regular sfl file, the first byte should never be 0 because the first byte should be part of the font name.
-			fread(&_firstByte,1,1,fp);
+			crossfread(&_firstByte,1,1,fp);
 			if (_firstByte!=0){ // If it's not the special format
 				// Seek past the rest of the font name.
-				// Copy & pasted seek past next line code because we need to use regular IO instead of crossFile
-				while (1){
-					int _lastRead = fgetc(fp);
-					if (_lastRead==0x0A || _lastRead==EOF){
-						break;
-					}
-				}
-				fscanf(fp,"%hd %*hd\n",&_retBitmapFont->exportedSize); // Ignore the second number, the stored height, because it's too tall
+				seekNextLine(fp);
+				_retBitmapFont->exportedSize = crossReadInt(fp);
+				seekNextLine(fp); // Ignore the second number, the stored height, because it's too tall
 			}
 			// This is here because the special format and regular format share it
 			char* _tempReadName = fancyReadLine(fp);
@@ -117,7 +112,9 @@ crossFont loadFont(const char* filename, double _passedSize){
 				// first_characters_ascii_value width_of_characters height_of_characters
 				short _readWidth;
 				short _readHeight;
-				fscanf(fp,"%hd %hd %hd",&_retBitmapFont->firstLetter,&_readWidth,&_readHeight);
+				_retBitmapFont->firstLetter=crossReadInt(fp);
+				_readWidth=crossReadInt(fp);
+				_readHeight=crossReadInt(fp);
 
 				short _imageWidthChars = (getTextureWidth(_retBitmapFont->internalImage)/_readWidth);
 				short _imageHeightChars = (getTextureHeight(_retBitmapFont->internalImage)/_readHeight);
@@ -140,7 +137,7 @@ crossFont loadFont(const char* filename, double _passedSize){
 					}
 				}
 			}else{
-				fscanf(fp,"%hd\n",&_retBitmapFont->numLetters);
+				_retBitmapFont->numLetters=crossReadInt(fp); // will go to next line too
 				
 				_retBitmapFont->letterInfos = malloc(sizeof(struct bitmapFontLetter)*_retBitmapFont->numLetters);
 	
@@ -148,8 +145,15 @@ crossFont loadFont(const char* filename, double _passedSize){
 				int _highestReadIndex;
 				int i;
 				for (i=0;i<_retBitmapFont->numLetters;++i){
-					fscanf(fp,"%d %hd %hd %hd %hd %*d %*d %hd\n",&_highestReadIndex,&(_retBitmapFont->letterInfos[i].x),&(_retBitmapFont->letterInfos[i].y),&(_retBitmapFont->letterInfos[i].imageWidth),&(_retBitmapFont->letterInfos[i].imageHeight),&(_retBitmapFont->letterInfos[i].imageDisplayWidth));
-
+					_highestReadIndex=crossReadInt(fp);
+					_retBitmapFont->letterInfos[i].x=crossReadInt(fp);
+					_retBitmapFont->letterInfos[i].y=crossReadInt(fp);
+					_retBitmapFont->letterInfos[i].imageWidth=crossReadInt(fp);
+					_retBitmapFont->letterInfos[i].imageHeight=crossReadInt(fp);
+					seekPast(fp,' ');
+					seekPast(fp,' ');
+					_retBitmapFont->letterInfos[i].imageDisplayWidth=crossReadInt(fp);
+					seekNextLine(fp); // because there's a space at the end of the line for no reason, we need to do extra to get to the next line.
 					_retBitmapFont->letterInfos[i].yOffset = _retBitmapFont->letterInfos[i].y;
 					if (_retBitmapFont->letterInfos[i].imageHeight+_retBitmapFont->letterInfos[i].yOffset>_highestHeight){
 						_highestHeight = _retBitmapFont->letterInfos[i].imageHeight+_retBitmapFont->letterInfos[i].yOffset;
@@ -158,7 +162,7 @@ crossFont loadFont(const char* filename, double _passedSize){
 				_retBitmapFont->height=_highestHeight;
 				_retBitmapFont->firstLetter = _highestReadIndex-(_retBitmapFont->numLetters-1);
 			}
-			fclose(fp);
+			crossfclose(fp);
 
 			_retFont->data = _retBitmapFont;
 			_retFont->size = (_passedSize==-1) ? _retBitmapFont->exportedSize : _passedSize;

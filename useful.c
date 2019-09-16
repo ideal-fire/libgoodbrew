@@ -9,42 +9,47 @@
 
 #define COPYBUFF 16000
 
-#define SEPARATOR '/'
+
 #if GBPLAT == GB_WINDOWS
-	#undef SEPARATOR
 	#define SEPARATOR '\\'
+#else
+	#define SEPARATOR '/'
 #endif
 
-#if !(_POSIX_C_SOURCE >= 200809L)
-	// TODO - Make these use crossFile
-	#define __DEFAULTGETLINEMALLOC 50
-	#define __INCREMENTGETLINEMALLOC 100
-	
-	ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream){
-		if (*lineptr==NULL){
-			*n = __DEFAULTGETLINEMALLOC;
-			*lineptr = malloc(*n);
-		}
-		int _currentPos;
-		for(_currentPos=0;;){
-			if (_currentPos+1>=*n){
-				*n = *n+__INCREMENTGETLINEMALLOC;
-				*lineptr = realloc(*lineptr,*n);
-			}
-			int _lastRead = ((*lineptr)[_currentPos++]=fgetc(stream));
-			if (ferror(stream)){
-				return -1;
-			}else if (_lastRead==EOF){
-				--_currentPos; // Don't include EOF in buffer
-				break;
-			}else if(_lastRead==delim){
-				break;
-			}
-		}
-		(*lineptr)[_currentPos]='\0';
-		return _currentPos;
+#define __DEFAULTGETLINEMALLOC 50
+#define __INCREMENTGETLINEMALLOC 100
+
+ssize_t goodbrewGetDelim(char** lineptr, size_t* n, int delim, void* stream, char _iscrossfile){
+	if (*lineptr==NULL){
+		*n = __DEFAULTGETLINEMALLOC;
+		*lineptr = malloc(*n);
 	}
-	
+	int _currentPos;
+	for(_currentPos=0;;){
+		if (_currentPos+1>=*n){
+			*n = *n+__INCREMENTGETLINEMALLOC;
+			*lineptr = realloc(*lineptr,*n);
+		}
+		int _lastRead = ((*lineptr)[_currentPos++]=(_iscrossfile ? crossgetc(stream) : fgetc(stream)));
+		if (!_iscrossfile && ferror((FILE*)stream)){
+			return -1;
+		}else if (_lastRead==EOF){
+			--_currentPos; // Don't include EOF in buffer
+			break;
+		}else if(_lastRead==delim){
+			break;
+		}
+	}
+	(*lineptr)[_currentPos]='\0';
+	return _currentPos;
+}
+ssize_t crossgetline(char** lineptr, size_t* n, crossFile stream){
+	return goodbrewGetDelim(lineptr,n,'\n',stream,1);
+}
+#if !(_POSIX_C_SOURCE >= 200809L)
+	ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream){
+		return goodbrewGetDelim(lineptr,n,delim,stream,0);
+	}	
 	ssize_t getline(char** lineptr, size_t* n, FILE* stream){
 		return getdelim(lineptr,n,'\n',stream);
 	}
@@ -57,6 +62,20 @@ const char* findCharBackwards(const char* _startHere, const char* _endHere, int 
 		--_startHere;
 	}while(_startHere>_endHere);
 	return NULL;
+}
+int crossReadInt(crossFile fp){
+	char _readBuff[11];
+	int _curPos=0;
+	int _curChar;
+	while(_curPos!=10){
+		_curChar=crossgetc(fp);
+		if (_curChar==EOF || _curChar=='\n' || _curChar==' '){
+			break;
+		}
+		_readBuff[_curPos++]=(unsigned char)_curChar;
+	}
+	_readBuff[_curPos]='\0';
+	return atoi(_readBuff);
 }
 char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
 	if (crossfeof(fp)){
@@ -149,10 +168,10 @@ void seekPast(crossFile fp, unsigned char _target){
 void seekNextLine(crossFile fp){
 	seekPast(fp,0x0A);
 }
-char* fancyReadLine(FILE* fp){
+char* fancyReadLine(crossFile fp){
 	char* _tempReadLine = NULL;
 	size_t _tempReadLength = 0;
-	if (getline(&_tempReadLine,&_tempReadLength,fp)!=0){
+	if (crossgetline(&_tempReadLine,&_tempReadLength,fp)!=0){
 		removeNewline(_tempReadLine);
 	}
 	return _tempReadLine;
