@@ -98,7 +98,9 @@ crossDir openDirectory(const char* filepath);
 void removeNewline(char* _toRemove);
 void utf2ascii(char* dst, u16* src);
 void wait(int miliseconds);
-
+u64 getHDTimeRes();
+u64 getHDTime();
+	
 #ifdef __cplusplus
 }
 #endif

@@ -59,7 +59,6 @@ void wait(int miliseconds){
 		usleep(miliseconds*1000);
 	#endif
 }
-
 u64 getMilli(){
 	#if GBPLAT == GB_VITA
 		return  (sceKernelGetProcessTimeWide() / 1000);
@@ -81,6 +80,20 @@ u64 getMilli(){
 		struct timespec _myTime;
 		clock_gettime(CLOCK_MONOTONIC, &_myTime);
 		return _myTime.tv_nsec/1000000;
+	#endif
+}
+u64 getHDTimeRes(){
+	#if GBREND == GBREND_SDL
+		return SDL_GetPerformanceFrequency();
+	#else
+		return 1000;
+	#endif
+}
+u64 getHDTime(){
+	#if GBREND == GBREND_SDL
+		return SDL_GetPerformanceCounter();
+	#else
+		return getMilli();
 	#endif
 }
 signed char checkFileExist(const char* location){
