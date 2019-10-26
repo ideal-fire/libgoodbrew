@@ -25,12 +25,13 @@ ssize_t goodbrewGetDelim(char** lineptr, size_t* n, int delim, void* stream, cha
 		*lineptr = malloc(*n);
 	}
 	int _currentPos;
+	int  _lastRead;
 	for(_currentPos=0;;){
 		if (_currentPos+1>=*n){
 			*n = *n+__INCREMENTGETLINEMALLOC;
 			*lineptr = realloc(*lineptr,*n);
 		}
-		int _lastRead = ((*lineptr)[_currentPos++]=(_iscrossfile ? crossgetc(stream) : fgetc(stream)));
+		_lastRead = ((*lineptr)[_currentPos++]=(_iscrossfile ? crossgetc(stream) : fgetc(stream)));
 		if (!_iscrossfile && ferror((FILE*)stream)){
 			return -1;
 		}else if (_lastRead==EOF){
@@ -39,6 +40,9 @@ ssize_t goodbrewGetDelim(char** lineptr, size_t* n, int delim, void* stream, cha
 		}else if(_lastRead==delim){
 			break;
 		}
+	}
+	if (_currentPos==0 && _lastRead==EOF){
+		return -1;
 	}
 	(*lineptr)[_currentPos]='\0';
 	return _currentPos;
