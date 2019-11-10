@@ -23,7 +23,14 @@
 */
 #if GBREND == GBREND_SDL
 	crossTexture surfaceToTexture(SDL_Surface* _tempSurface){
+		if (_tempSurface==NULL){
+			printf("_tempSurface is NULL. failed to load image. %s\n",IMG_GetError());
+			return NULL;
+		}
 		SDL_Texture* _returnTexture = SDL_CreateTextureFromSurface( mainWindowRenderer, _tempSurface );
+		if (_returnTexture==NULL){
+			printf("SDL_CreateTextureFromSurface failed. %s\n",SDL_GetError());
+		}
 		SDL_FreeSurface(_tempSurface);
 		SDL_SetTextureBlendMode(_returnTexture, SDL_BLENDMODE_BLEND); // Allow the texture to be drawn translucent
 		return _returnTexture;

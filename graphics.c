@@ -64,15 +64,24 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 			windowHeight=720;
 			SDL_CreateWindowAndRenderer(windowWidth, windowHeight, 0, &mainWindow, &mainWindowRenderer);
 		#else
-			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN);
-			if (_passedFlags & WINDOWFLAG_RESIZABLE){
-				SDL_SetWindowResizable(mainWindow,SDL_TRUE);
-			}
+			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN);			
 		#endif
+		if (_passedFlags & WINDOWFLAG_RESIZABLE){
+			SDL_SetWindowResizable(mainWindow,SDL_TRUE);
+		}
+		if (mainWindow==NULL){
+			printf("Failed to create window %s\n",SDL_GetError());
+			return;
+		}
 		if (mainWindowRenderer==NULL){
 			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			if (mainWindowRenderer==NULL){
+				printf("libgoodbrew: falling back to no vsync\n");
 				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, 0);
+				if (mainWindowRenderer==NULL){
+					printf("failed to create renderer\n");
+					return;
+				}
 			}
 		}
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
