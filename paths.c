@@ -11,6 +11,7 @@
 #endif
 
 char* gbDataFolder=NULL;
+signed char gbDataFolderUsing=-2;
 
 // Passed string should be freed already
 signed char generateDefaultDataDirectory(char** _dataDirPointer, signed char _dataDirPreference){
@@ -58,10 +59,15 @@ signed char generateDefaultDataDirectory(char** _dataDirPointer, signed char _da
 	#endif
 	return _dataDirPreference;
 }
-
+signed char initGoodBrewDataDir(){
+	if (gbDataFolderUsing==-2){
+		gbDataFolderUsing=generateDefaultDataDirectory(&gbDataFolder,-1);
+	}
+	return gbDataFolderUsing;
+}
 char* getFixPathString(fileLocationType type){
 	if (gbDataFolder==NULL){
-		generateDefaultDataDirectory(&gbDataFolder,-1);
+		initGoodBrewDataDir();
 	}
 	if (type==TYPE_DATA){
 		return gbDataFolder;
@@ -94,12 +100,10 @@ char* getFixPathString(fileLocationType type){
 		return "";
 	}
 }
-
 void fixPath(const char* filename,char* _buffer, fileLocationType type){
 	strcpy(_buffer,getFixPathString(type));
 	strcat(_buffer,filename);
 }
-
 char* fixPathAlloc(const char* filename, fileLocationType type){
 	char* _foundPrefix = getFixPathString(type);
 	char* _returnBuff = malloc(strlen(filename)+strlen(_foundPrefix)+1);
@@ -107,7 +111,6 @@ char* fixPathAlloc(const char* filename, fileLocationType type){
 	strcat(_returnBuff,filename);
 	return _returnBuff;
 }
-
 void makeDataDirectory(){
 	char* _foundDataDir = getFixPathString(TYPE_DATA);
 	if (directoryExists(_foundDataDir)==0){

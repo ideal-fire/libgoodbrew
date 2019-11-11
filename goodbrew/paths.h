@@ -11,8 +11,12 @@ typedef enum{
 }fileLocationType;
 
 extern char* gbDataFolder;
+// -2 by default. Its values correspond to those passed to generateDefaultDataDirectory
+extern signed char gbDataFolderUsing;
 
 char* fixPathAlloc(const char* filename, fileLocationType type);
+// returns the data dir selected. see generateDefaultDataDirectory _dataDirPreference
+signed char initGoodBrewDataDir();
 void fixPath(const char* filename,char* _buffer, fileLocationType type);
 // to set the internal one used by fixPath, use gbDataFolder.
 // _dataDirPreference:
