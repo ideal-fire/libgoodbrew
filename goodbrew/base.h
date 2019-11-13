@@ -3,7 +3,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+	
 #include <stdint.h>
 #include <stdio.h>
 #include <inttypes.h>
@@ -18,9 +18,8 @@ extern "C" {
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	#include <dirent.h>
 #endif
-
 //////////////////////////////
-
+// Standard aliases
 typedef uint8_t 	u8;
 typedef uint16_t 	u16;
 typedef uint32_t	u32;
@@ -31,7 +30,7 @@ typedef int32_t		s32;
 typedef int64_t		s64;
 
 //////////////////////////////
-
+// Crossfile
 enum corssFileSeekPoint{
 	CROSSFILE_START,
 	CROSSFILE_CUR,
@@ -55,7 +54,7 @@ enum corssFileSeekPoint{
 #endif
 
 //////////////////////////////
-
+// crossDir
 // Directory paths should end in a slash
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	typedef DIR* crossDir;
@@ -73,7 +72,6 @@ enum corssFileSeekPoint{
 #endif
 
 //////////////////////////////
-
 signed char checkFileExist(const char* location);
 void createDirectory(const char* path);
 int crossfclose(crossFile stream);

@@ -1,16 +1,7 @@
 #include <goodbrew/config.h>
 #include <goodbrew/base.h>
 #include <goodbrew/graphics.h>
-
-#if DOFIXCOORDS == 1
-	void FixCoords(int* _x, int* _y){
-		*_x = fixX(*_x);
-		*_y = fixY(*_y);
-	}
-#else
-	void FixCoords(int* _x, int* _y){
-	}
-#endif
+#include <goodbrew/goodbrewInternal.h>
 // Renderer stuff
 #if GBREND == GBREND_SDL
 	#include <SDL2/SDL.h>
@@ -32,6 +23,22 @@
 int _goodbrewRealScreenWidth=1;
 int _goodbrewRealScreenHeight=1;
 
+static int _goodbrewDrawOffX=0;
+static int _goodbrewDrawOffY=0;
+
+GETTERFUNC(gbGetDrawOffX,int,_goodbrewDrawOffX);
+GETTERFUNC(gbGetDrawOffY,int,_goodbrewDrawOffY);
+SETTERFUNC(gbSetDrawOffX,int,_goodbrewDrawOffX);
+SETTERFUNC(gbSetDrawOffY,int,_goodbrewDrawOffY);
+
+void FixCoords(int* _x, int* _y){
+	*_x=*_x+_goodbrewDrawOffX;
+	*_y=*_y+_goodbrewDrawOffY;
+	#if DOFIXCOORDS == 1
+		*_x = fixX(*_x);
+		*_y = fixY(*_y);
+	#endif
+}
 int getScreenWidth(){
 	return _goodbrewRealScreenWidth;
 }
@@ -164,7 +171,6 @@ void quitGraphics(){
 		// TODO - SDL quit
 	#endif
 }
-
 void setClearColor(int r, int g, int b){
 	#if GBREND == GBREND_SDL
 		SDL_SetRenderDrawColor( mainWindowRenderer, r, g, b, 255 );
@@ -174,7 +180,6 @@ void setClearColor(int r, int g, int b){
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
 	#endif
 }
-
 // Evade fix coords
 void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 	#if GBREND == GBREND_VITA2D
@@ -197,12 +202,10 @@ void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 		sf2d_draw_rectangle(x,y,w,h,RGBA8(r,g,b,a));
 	#endif
 }
-
 void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 	EASYFIXCOORDS(&x,&y);
 	_drawRectangle(x,y,w,h,r,g,b,a);
 }
-
 void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b){
 	int _halfWastedHeight = (_goodbrewRealScreenHeight-_usedHeight)/2;
 	_drawRectangle(0,0,_goodbrewRealScreenWidth,_halfWastedHeight,r,g,b,255);
@@ -211,7 +214,6 @@ void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b){
 	_drawRectangle(0,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
 	_drawRectangle(_goodbrewRealScreenWidth-_halfWastedHeight,0,_halfWastedHeight,_goodbrewRealScreenHeight,r,g,b,255);
 }
-
 void enableClipping(int x, int y, int w, int h){
 	#if GBREND == GBREND_VITA2D
 		vita2d_enable_clipping(x,y,x+w,y+h);

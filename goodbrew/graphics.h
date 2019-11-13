@@ -4,14 +4,11 @@
 extern "C" {
 #endif
 
-
 #if DOFIXCOORDS == 1
 	int fixX(int x);
-	int fixY(int y);
-	#define EASYFIXCOORDS(x, y) FixCoords(x,y)
-#else
-	#define EASYFIXCOORDS(x,y)
+	int fixY(int y);	
 #endif
+#define EASYFIXCOORDS(x, y) FixCoords(x,y)
 
 #define WINDOWFLAG_FULLSCREEN 1
 #define WINDOWFLAG_RESIZABLE 2
@@ -36,7 +33,11 @@ void FixCoords(int* _x, int* _y);
 void initImages();
 void enableClipping(int x, int y, int w, int h);
 void disableClipping();
-	#ifdef __cplusplus
+int gbGetDrawOffX();
+int gbGetDrawOffY();
+void gbSetDrawOffX(int _passed);
+void gbSetDrawOffY(int _passed);
+#ifdef __cplusplus
 }
 #endif
 #endif // GOODBREWGRAPHICSINCLUDED_H
