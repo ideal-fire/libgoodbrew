@@ -4,6 +4,10 @@
 extern "C" {
 #endif
 
+#if GBREND==GBREND_SDL
+	extern SDL_Window* mainWindow;
+	extern SDL_Renderer* mainWindowRenderer;
+#endif
 #if DOFIXCOORDS == 1
 	int fixX(int x);
 	int fixY(int y);	
