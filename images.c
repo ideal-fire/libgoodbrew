@@ -92,11 +92,14 @@ void initImages(){
 // 0 - unknown
 // 1 - png
 // 2 - jpg
+// 3 - bmp
 static char getImageType(unsigned char _magicStart){
 	if (_magicStart==0x89){
 		return 1;
 	}else if (_magicStart==0xFF){
 		return 2;
+	}else if (_magicStart==0x42){
+		return 3;
 	}else{
 		return 0;
 	}
@@ -107,6 +110,8 @@ crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
 			return loadPNGBuffer(_passedBuffer,_passedBufferSize);
 		case 2:
 			return loadJPGBuffer(_passedBuffer,_passedBufferSize);
+		case 3:
+			return loadBMPBuffer(_passedBuffer,_passedBufferSize);
 	}
 	return NULL;
 }
@@ -119,6 +124,8 @@ crossTexture loadImage(const char* path){
 			return loadPNG(path);
 		case 2:
 			return loadJPG(path);
+		case 3:
+			return loadBMP(path);
 	}
 	return NULL;
 }
@@ -140,6 +147,15 @@ crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
 		return sfil_load_JPEG_buffer(_passedBuffer,_passedBufferSize,SF2D_PLACE_RAM);
 	#endif
 }
+crossTexture loadBMPBuffer(void* _passedBuffer, int _passedBufferSize){
+	#if GBREND == GBREND_VITA2D
+		return vita2d_load_BMP_buffer(_passedBuffer);
+	#elif GBREND == GBREND_SDL
+		return surfaceToTexture(SDL_LoadBMP_RW(SDL_RWFromMem(_passedBuffer,_passedBufferSize),1));
+	#elif GBREND == GBREND_SF2D
+		return sfil_load_BMP_buffer(path,SF2D_PLACE_RAM);
+	#endif
+}
 crossTexture loadPNG(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_PNG_file(path);
@@ -156,6 +172,15 @@ crossTexture loadJPG(const char* path){
 		return loadPNG(path);
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
+	#endif
+}
+crossTexture loadBMP(const char* path){
+	#if GBREND == GBREND_VITA2D
+		return vita2d_load_BMP_file(path);
+	#elif GBREND == GBREND_SDL
+		return surfaceToTexture(SDL_LoadBMP(path));
+	#elif GBREND == GBREND_SF2D
+		return sfil_load_BMP_file(path,SF2D_PLACE_RAM);
 	#endif
 }
 void freeTexture(crossTexture passedTexture){
