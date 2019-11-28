@@ -1,3 +1,5 @@
+#define GBVERSION 2
+
 #define GB_LINUX 1
 #define GB_WINDOWS 2
 #define GB_VITA 3
