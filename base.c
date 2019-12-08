@@ -292,12 +292,16 @@ size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){
 }
 crossFile crossfopen(const char* filename, const char* mode){
 	#if GBPLAT == GB_VITA
-		vitaFile* _returnFile = malloc(sizeof(vitaFile));
-		_returnFile->fp=fopen(filename,mode);
-		_returnFile->filename = malloc(strlen(filename)+1);
+		FILE* fp = fopen(filename,mode);
+		if (fp!=NULL){
+			vitaFile* _returnFile = malloc(sizeof(vitaFile));
+			_returnFile->fp=fp;
+			_returnFile->filename = malloc(strlen(filename)+1);
 			strcpy(_returnFile->filename,filename);
-		_returnFile->internalPosition=0;
-		return _returnFile;
+			_returnFile->internalPosition=0;
+			return _returnFile;
+		}
+		return NULL;
 	#elif GBREND == GBREND_SDL
 		return SDL_RWFromFile(filename,mode);
 	#else

@@ -117,6 +117,9 @@ crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
 }
 crossTexture loadImage(const char* path){
 	crossFile fp=crossfopen(path,"rb");
+	if (fp==NULL){
+		return NULL;
+	}
 	unsigned char _magicStart = crossgetc(fp);
 	crossfclose(fp);
 	switch(getImageType(_magicStart)){
