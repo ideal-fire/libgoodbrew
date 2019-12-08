@@ -1,4 +1,4 @@
-#define GBVERSION 2
+#define GBVERSION 3
 
 #define GB_LINUX 1
 #define GB_WINDOWS 2

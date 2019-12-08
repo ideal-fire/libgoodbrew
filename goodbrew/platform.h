@@ -9,7 +9,7 @@
 	#define gbHasTouch() GBPREFERRED
 	#define gbHasButtons() GBMAYBE
 #elif GBPLAT == GB_VITA
-	#define gbHasTouch() GBNO // support eventually maybe
+	#define gbHasTouch() GBYES
 	#define gbHasButtons() GBPREFERRED
 #elif GBPLAT == GB_3DS
 	#define gbHasTouch() GBNO

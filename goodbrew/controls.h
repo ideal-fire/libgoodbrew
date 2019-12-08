@@ -27,6 +27,7 @@ typedef enum{
 	NUMBUTTONS
 }crossButton;
 
+char controlsInit();
 void controlsEnd();
 void controlsStart();
 #define controlsReset() controlsStart(); controlsEnd();

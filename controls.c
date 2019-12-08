@@ -12,6 +12,7 @@ char buttonAlias[NUMBUTTONS];
 
 #if GBPLAT == GB_VITA
 	#include <psp2/ctrl.h>
+	#include <psp2/touch.h>
 #elif GBPLAT == GB_3DS
 	#include <3ds/types.h>
 #elif GBPLAT == GB_SWITCH
@@ -113,11 +114,7 @@ void _readSDLControls(){
 			lastClickWasRight = (e.button.button==SDL_BUTTON_RIGHT);
 			break;
 		case SDL_MOUSEMOTION: // Click and drag
-			if (!currentPad[BUTTON_TOUCH]){
-				break;
-			}
 			SDL_GetMouseState(&touchX,&touchY);
-			currentPad[BUTTON_TOUCH] = 1;
 			break;
 		case SDL_FINGERUP:
 			currentPad[BUTTON_TOUCH] = 0;
@@ -141,6 +138,15 @@ void controlsStart(){
 	// TODO - Work on touch for homebrew systems
 	currentPad[BUTTON_RESIZE]=0;
 	#if GBPLAT == GB_VITA
+		SceTouchData _curTouch;
+		sceTouchPeek(SCE_TOUCH_PORT_FRONT,&_curTouch,1);
+		if (_curTouch.reportNum>0){
+			currentPad[BUTTON_TOUCH]=1;
+			touchX=_curTouch.report[_curTouch.reportNum-1].x/2;
+			touchY=_curTouch.report[_curTouch.reportNum-1].y/2;
+		}else{
+			currentPad[BUTTON_TOUCH]=0;
+		}
 		SceCtrlData _pad;
 		sceCtrlPeekBufferPositive(0, &_pad, 1);
 		currentPad[BUTTON_A] = 		TOBOOL(_pad.buttons & SCE_CTRL_CROSS);
@@ -196,6 +202,12 @@ void controlsStart(){
 }
 void controlsEnd(){
 	memcpy(lastPad,currentPad,sizeof(currentPad));
+}
+char controlsInit(){
+	#if GBPLAT == GB_VITA
+		sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT,1);
+	#endif
+	return 0;
 }
 char wasJustReleased(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
