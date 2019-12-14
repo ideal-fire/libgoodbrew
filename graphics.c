@@ -26,6 +26,10 @@ int _goodbrewRealScreenHeight=1;
 static int _goodbrewDrawOffX=0;
 static int _goodbrewDrawOffY=0;
 
+static int _goodbrewClearR=0;
+static int _goodbrewClearG=0;
+static int _goodbrewClearB=0;
+
 GETTERFUNC(gbGetDrawOffX,int,_goodbrewDrawOffX);
 GETTERFUNC(gbGetDrawOffY,int,_goodbrewDrawOffY);
 SETTERFUNC(gbSetDrawOffX,int,_goodbrewDrawOffX);
@@ -179,6 +183,14 @@ void setClearColor(int r, int g, int b){
 	#elif GBREND == GBREND_SF2D
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
 	#endif
+	_goodbrewClearR=r;
+	_goodbrewClearG=g;
+	_goodbrewClearB=b;
+}
+void getClearColor(int* r, int* g, int* b){
+	*r=_goodbrewClearR;
+	*g=_goodbrewClearG;
+	*b=_goodbrewClearB;
 }
 // Evade fix coords
 void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
