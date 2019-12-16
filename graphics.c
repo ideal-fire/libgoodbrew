@@ -85,7 +85,11 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 			return;
 		}
 		if (mainWindowRenderer==NULL){
-			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			long _sdlWinFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+			if (_passedFlags & WINDOWFLAG_EXTRAFEATURES){
+				_sdlWinFlags|=SDL_RENDERER_TARGETTEXTURE;
+			}
+			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, _sdlWinFlags);
 			if (mainWindowRenderer==NULL){
 				printf("libgoodbrew: falling back to no vsync\n");
 				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, 0);

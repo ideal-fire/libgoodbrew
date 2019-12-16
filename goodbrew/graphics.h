@@ -16,6 +16,7 @@ extern "C" {
 
 #define WINDOWFLAG_FULLSCREEN 1
 #define WINDOWFLAG_RESIZABLE 2
+#define WINDOWFLAG_EXTRAFEATURES 4
 
 extern int _goodbrewRealScreenWidth;
 extern int _goodbrewRealScreenHeight;
