@@ -31,7 +31,7 @@ int getScreenWidth();
 void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags);
 void quitGraphics();
 void setClearColor(int r, int g, int b);
-void getClearColor(int* r, int* g, int* b);
+void getClearColor(unsigned char* r, unsigned char* g, unsigned char* b);
 void setWindowTitle(char* _newTitle);
 void startDrawingBottom();
 void startDrawing();

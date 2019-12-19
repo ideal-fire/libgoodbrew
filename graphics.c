@@ -191,7 +191,7 @@ void setClearColor(int r, int g, int b){
 	_goodbrewClearG=g;
 	_goodbrewClearB=b;
 }
-void getClearColor(int* r, int* g, int* b){
+void getClearColor(unsigned char* r, unsigned char* g, unsigned char* b){
 	*r=_goodbrewClearR;
 	*g=_goodbrewClearG;
 	*b=_goodbrewClearB;

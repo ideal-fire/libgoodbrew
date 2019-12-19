@@ -97,6 +97,11 @@ u64 getHDTime(){
 	#endif
 }
 signed char checkFileExist(const char* location){
+	#if GBPLAT == GB_ANDROID && GBREND == GBREND_SDL
+		if (strstr(location,"//")!=NULL){
+			SDL_Log("========checkFileExist bad path:%s\n",location);
+		}
+	#endif
 	#if GBPLAT == GB_VITA
 		SceUID fileHandle = sceIoOpen(location, SCE_O_RDONLY, 0777);
 		if (fileHandle < 0){
@@ -105,6 +110,13 @@ signed char checkFileExist(const char* location){
 			sceIoClose(fileHandle);
 			return 1;
 		}
+	#elif GBREND == GBREND_SDL
+		crossFile _potentialFile = crossfopen(location,"rb");
+		if (_potentialFile){
+			crossfclose(_potentialFile);
+			return 1;
+		}
+		return 0;
 	#elif GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 		return (access( location, F_OK ) != -1);
 	#else
