@@ -260,3 +260,11 @@ void gbDrawTextf(crossFont _passedFont, int x, int y, unsigned char r, unsigned 
 	gbDrawTextAlpha(_passedFont,x,y,_completeString,r,g,b,a);
 	free(_completeString);
 }
+void gbDrawTextfCenter(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, int _containerW, const char* _formatString, ...){
+	va_list _tempArgs;
+	va_start(_tempArgs, _formatString);
+	char* _completeString = formatf(_tempArgs,_formatString);
+	x+=(_containerW-textWidth(_passedFont,_completeString))/2;
+	gbDrawTextAlpha(_passedFont,x,y,_completeString,r,g,b,a);
+	free(_completeString);
+}
