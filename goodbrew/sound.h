@@ -15,7 +15,7 @@ extern "C" {
 	#endif
 	typedef Mix_Chunk* crossSE;
 	typedef Mix_Music* crossMusic;
-	typedef void* crossPlayHandle;
+	typedef int crossPlayHandle;
 #elif GBSND == GBSND_SOLOUD
 	#include <soloud_c.h>
 	typedef WavStream* crossMusic;

@@ -93,7 +93,7 @@ void setSFXVolumeBefore(crossSE tochange, int toval){
 }
 void setSFXVolume(crossPlayHandle tochange, int toval){
 	#if GBSND == GBSND_SDL
-		setSFXVolumeBefore(tochange,toval);
+		Mix_Volume(tochange,toval);
 	#elif GBSND == GBSND_SOLOUD
 		setMusicVolume(tochange,toval);
 	#elif GBSND == GBSND_3DS
@@ -189,8 +189,7 @@ void stopSound(crossSE toStop){
 }
 crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel){
 	#if GBSND == GBSND_SDL
-		Mix_PlayChannel( -1, toPlay, 0 );
-		return toPlay;
+		return Mix_PlayChannel( -1, toPlay, 0 );
 	#elif GBSND == GBSND_SOLOUD
 		return Soloud_play(mySoLoudEngine,toPlay);
 	#elif GBSND == GBSND_3DS
@@ -207,7 +206,7 @@ crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel){
 crossPlayHandle playMusic(crossMusic toPlay, unsigned char _passedChannel){
 	#if GBSND == GBSND_SDL
 		Mix_PlayMusic(toPlay,-1);
-		return toPlay;
+		return -1;
 	#elif GBSND == GBSND_SOLOUD
 		WavStream_setLooping(toPlay,1);
 		return Soloud_play(mySoLoudEngine,toPlay);
