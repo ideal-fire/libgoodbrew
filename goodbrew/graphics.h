@@ -5,12 +5,13 @@ extern "C" {
 #endif
 
 #if GBREND==GBREND_SDL
+	#include <SDL2/SDL.h>
 	extern SDL_Window* mainWindow;
 	extern SDL_Renderer* mainWindowRenderer;
 #endif
 #if DOFIXCOORDS == 1
-	int fixX(int x);
-	int fixY(int y);	
+	float fixX(float x);
+	float fixY(float y);
 #endif
 #define EASYFIXCOORDS(x, y) FixCoords(x,y)
 
@@ -22,9 +23,8 @@ extern int _goodbrewRealScreenWidth;
 extern int _goodbrewRealScreenHeight;
 
 void gbCoverUnused(int _usedWidth, int _usedHeight, int r, int g, int b); // Assuming that _usedWidth and _usedHeight are the dimensions of the space you're using, and you've centered everything
-void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a);
+void drawRectangle(float x, float y, int w, int h, int r, int g, int b, int a);
 void endDrawing();
-void FixCoords(int* _x, int* _y);
 int getScreenHeight();
 int getScreenWidth();
 // _windowWidth and _windowHeight are recommendations for the Window size. Will be ignored on many platforms. Need to use getScreenWidth and getScreenHeight after calling.
@@ -35,7 +35,7 @@ void getClearColor(unsigned char* r, unsigned char* g, unsigned char* b);
 void setWindowTitle(char* _newTitle);
 void startDrawingBottom();
 void startDrawing();
-void FixCoords(int* _x, int* _y);
+void FixCoords(float* _x, float* _y);
 void initImages();
 void enableClipping(int x, int y, int w, int h);
 void disableClipping();

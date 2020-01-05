@@ -2,6 +2,7 @@
 #include <goodbrew/base.h>
 #include <goodbrew/graphics.h>
 #include <goodbrew/images.h>
+#include <stdlib.h>
 #include <stdio.h>
 #if GBREND == GBREND_SDL
 	extern SDL_Window* mainWindow;
@@ -82,12 +83,51 @@
 			SDL_SetTextureAlphaMod(passedTexture, olda);
 		}
 	}
+#elif GBREND == GBREND_RAY
+	void rayDrawShared(Texture2D* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, Color tint){
+		Rectangle _srcRect;
+		if (partX==-1){
+			_srcRect.width=getTextureWidth(passedTexture);
+			_srcRect.height=getTextureHeight(passedTexture);
+			_srcRect.x=0;
+			_srcRect.y=0;
+		}else{
+			_srcRect.width=partW;
+			_srcRect.height=partH;
+			_srcRect.x=partX;
+			_srcRect.y=partY;
+		}
+		Rectangle _destRect;
+		if (destW==-1){
+			_destRect.width=_srcRect.width;
+			_destRect.height=_srcRect.height;
+		}else{
+			_destRect.width=destW;
+			_destRect.height=destH;
+		}
+		_destRect.x=destX;
+		_destRect.y=destY;
+		Vector2 _rotateOrigin;
+		_rotateOrigin.x=0;
+		_rotateOrigin.y=0;
+		DrawTexturePro(*passedTexture,_srcRect,_destRect,_rotateOrigin,0,tint);
+	}
 #endif
 void initImages(){
 	#if GBREND == GBREND_SDL
 		IMG_Init( IMG_INIT_PNG );
 		IMG_Init( IMG_INIT_JPG );
 	#endif
+}
+void enableSmoothScaling(crossTexture _passedTexture){
+	#if GBREND == GBREND_VITA2D
+		vita2d_texture_set_filters(_passedTexture,SCE_GXM_TEXTURE_FILTER_LINEAR,SCE_GXM_TEXTURE_FILTER_LINEAR);
+	#elif GBREND == GBREND_RAY
+		SetTextureFilter(*_passedTexture,FILTER_BILINEAR);
+	#else
+		printf("set smooth scaling unsuported\n");
+	#endif
+	
 }
 // 0 - unknown
 // 1 - png
@@ -166,15 +206,19 @@ crossTexture loadPNG(const char* path){
 		return surfaceToTexture(IMG_Load(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
+	#elif GBREND == GBREND_RAY
+		Texture2D* _ret = malloc(sizeof(Texture2D));
+		*_ret=LoadTexture(path);
+		return _ret;
 	#endif
 }
 crossTexture loadJPG(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_JPEG_file(path);
-	#elif GBREND == GBREND_SDL
-		return loadPNG(path);
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
+	#elif GBREND == GBREND_SDL || GBREND == GBREND_RAY
+		return loadPNG(path);
 	#endif
 }
 crossTexture loadBMP(const char* path){
@@ -184,6 +228,8 @@ crossTexture loadBMP(const char* path){
 		return surfaceToTexture(SDL_LoadBMP(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_BMP_file(path,SF2D_PLACE_RAM);
+	#elif GBREND == GBREND_RAY
+		return loadPNG(path);
 	#endif
 }
 void freeTexture(crossTexture passedTexture){
@@ -199,6 +245,9 @@ void freeTexture(crossTexture passedTexture){
 		SDL_DestroyTexture(passedTexture);
 	#elif GBREND == GBREND_SF2D
 		sf2d_free_texture(passedTexture);
+	#elif GBREND == GBREND_RAY
+		UnloadTexture(*passedTexture);
+		free(passedTexture);
 	#endif
 }
 int getTextureWidth(const crossTexture passedTexture){
@@ -209,6 +258,8 @@ int getTextureWidth(const crossTexture passedTexture){
 		SDL_QueryTexture(passedTexture, NULL, NULL, &w, &h);
 		return w;
 	#elif GBREND == GBREND_SF2D
+		return passedTexture->width;
+	#elif GBREND == GBREND_RAY
 		return passedTexture->width;
 	#endif
 }
@@ -221,10 +272,12 @@ int getTextureHeight(const crossTexture passedTexture){
 		return h;
 	#elif GBREND == GBREND_SF2D
 		return passedTexture->height;
+	#elif GBREND == GBREND_RAY
+		return passedTexture->height;
 	#endif
 }
 // Zero modifiers
-void drawTexture(const crossTexture passedTexture, int destX, int destY){
+void drawTexture(const crossTexture passedTexture, float destX, float destY){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture(passedTexture,destX,destY);
@@ -232,10 +285,12 @@ void drawTexture(const crossTexture passedTexture, int destX, int destY){
 		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture(passedTexture,_destX,_destY);
+	#elif GBREND == GBREND_RAY
+		DrawTexture(*passedTexture,destX,destY,WHITE);
 	#endif
 }
 // One modifier
-void drawTextureSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH){
+void drawTextureSized(const crossTexture passedTexture, float destX, float destY, int destW, int destH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_sized(passedTexture,destX,destY,destW,destH);
@@ -243,9 +298,11 @@ void drawTextureSized(const crossTexture passedTexture, int destX, int destY, in
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale(passedTexture,destX,destY,partXScale,partYScale);
+	#elif GBREND == GBREND_RAY
+		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,WHITE);
 	#endif
 }
-void drawTextureAlpha(const crossTexture passedTexture, int destX, int destY, unsigned char alpha){
+void drawTextureAlpha(const crossTexture passedTexture, float destX, float destY, unsigned char alpha){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
@@ -253,13 +310,20 @@ void drawTextureAlpha(const crossTexture passedTexture, int destX, int destY, un
 		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_texture_blend(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
+	#elif GBREND == GBREND_RAY
+		Color _c;
+		_c.r=255;
+		_c.g=255;
+		_c.b=255;
+		_c.a=alpha;
+		DrawTexture(*passedTexture,destX,destY,_c);
 	#endif
 }
-void drawTextureScaled(const crossTexture passedTexture, int destX, int destY, double _scaleFactor){
+void drawTextureScaled(const crossTexture passedTexture, float destX, float destY, double _scaleFactor){
 	drawTextureSized(passedTexture,destX,destY,getTextureWidth(passedTexture)*_scaleFactor,getTextureHeight(passedTexture)*_scaleFactor);
 }
 // Two modifiers
-void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH){
+void drawTexturePartSized(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH);
@@ -267,9 +331,11 @@ void drawTexturePartSized(const crossTexture passedTexture, int destX, int destY
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
+	#elif GBREND == GBREND_RAY
+		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,WHITE);
 	#endif
 }
-void drawTextureSizedAlpha(const crossTexture passedTexture, int _drawX, int _drawY, int _scaledW, int _scaledH, unsigned char alpha){
+void drawTextureSizedAlpha(const crossTexture passedTexture, float _drawX, float _drawY, int _scaledW, int _scaledH, unsigned char alpha){
 	EASYFIXCOORDS(&_drawX,&_drawY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,_drawX,_drawY,_scaledW,_scaledH,RGBA8(255,255,255,alpha));
@@ -277,9 +343,16 @@ void drawTextureSizedAlpha(const crossTexture passedTexture, int _drawX, int _dr
 		SDLDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(255,255,255,alpha));
+	#elif GBREND == GBREND_RAY
+		Color _c;
+		_c.r=255;
+		_c.g=255;
+		_c.b=255;
+		_c.a=alpha;
+		rayDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,_c);
 	#endif
 }
-void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
+void drawTextureSizedTint(const crossTexture passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,destX,destY,destW,destH,RGBA8(r,g,b,255));
@@ -287,10 +360,17 @@ void drawTextureSizedTint(const crossTexture passedTexture, int destX, int destY
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,255,1,1);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(r,g,b,255));
+	#elif GBREND == GBREND_RAY
+		Color _c;
+		_c.r=r;
+		_c.g=g;
+		_c.b=b;
+		_c.a=255;
+		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,_c);
 	#endif
 }
 // Three modifiers
-void drawTexturePartSizedAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha){
+void drawTexturePartSizedAlpha(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(255,255,255,alpha));
@@ -298,10 +378,17 @@ void drawTexturePartSizedAlpha(const crossTexture passedTexture, int destX, int 
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
+	#elif GBREND == GBREND_RAY
+		Color _c;
+		_c.r=255;
+		_c.g=255;
+		_c.b=255;
+		_c.a=alpha;
+		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
 	#endif
 }
 // All four modifiers
-void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(r,g,b,a));
@@ -309,5 +396,12 @@ void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, int destX, 
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,r,g,b,a,1,1);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale, RGBA8(r,g,b,a));
+	#elif GBREND == GBREND_RAY
+		Color _c;
+		_c.r=r;
+		_c.g=g;
+		_c.b=b;
+		_c.a=a;
+		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
 	#endif
 }

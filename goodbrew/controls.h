@@ -5,8 +5,10 @@ extern "C" {
 #endif
 
 
+// If this is updated, remember to also update the raylib alias
 typedef enum{
-	BUTTON_A = 1,
+	BUTTON_UNKNOWN = 0,
+	BUTTON_A,
 	BUTTON_B,
 	BUTTON_X,
 	BUTTON_Y,
@@ -22,7 +24,6 @@ typedef enum{
 	BUTTON_SCROLL, // PC, use mouseScroll variable
 	BUTTON_BACK, // Android
 	BUTTON_RESIZE, // On window resize. Use getWindowWidth and getWindowHeight
-
 
 	NUMBUTTONS
 }crossButton;

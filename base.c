@@ -11,24 +11,23 @@
 
 #if GBPLAT == GB_WINDOWS
 	#include <windows.h>
-#endif
-#if GBPLAT == GB_LINUX
+#elif GBPLAT == GB_LINUX
 	#include <sys/types.h>
 	#include <sys/stat.h>
-#endif
-#if GBPLAT == GB_ANDROID
+#elif GBPLAT == GB_ANDROID
 	// For mkdir
 	#include <sys/stat.h>
-#endif
-#if GBPLAT == GB_VITA
+#elif GBPLAT == GB_VITA
 	#include <psp2/kernel/threadmgr.h>
 	#include <psp2/kernel/processmgr.h>
 	#include <psp2/io/fcntl.h>
-#endif
-#if GBPLAT == GB_3DS
+#elif GBPLAT == GB_3DS
 	FS_Archive _sdArchive=0;
 #endif
-
+#if GBREND == GBREND_RAY
+	#include <raylib.h>
+	#define RAYLIBHDTIMERES 10000
+#endif
 void generalGoodInit(){
 	#if GBPLAT == GB_3DS
 		FSUSER_OpenArchive(&_sdArchive, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
@@ -76,6 +75,8 @@ u64 getMilli(){
 		} else {
 		    return GetTickCount();
 		}
+	#elif GBREND == GBREND_RAY
+		return GetTime()*1000;
 	#else
 		struct timespec _myTime;
 		clock_gettime(CLOCK_MONOTONIC, &_myTime);
@@ -85,6 +86,8 @@ u64 getMilli(){
 u64 getHDTimeRes(){
 	#if GBREND == GBREND_SDL
 		return SDL_GetPerformanceFrequency();
+	#elif GBREND == GBREND_RAY
+		return RAYLIBHDTIMERES;
 	#else
 		return 1000;
 	#endif
@@ -92,6 +95,8 @@ u64 getHDTimeRes(){
 u64 getHDTime(){
 	#if GBREND == GBREND_SDL
 		return SDL_GetPerformanceCounter();
+	#elif GBREND == GBREND_RAY
+		return GetTime()*RAYLIBHDTIMERES;
 	#else
 		return getMilli();
 	#endif

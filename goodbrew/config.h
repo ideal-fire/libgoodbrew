@@ -1,4 +1,4 @@
-#define GBVERSION 5
+#define GBVERSION 6
 
 #define GB_LINUX 1
 #define GB_WINDOWS 2
@@ -17,11 +17,13 @@
 #define GBREND_VITA2D 1
 #define GBREND_SDL 2
 #define GBREND_SF2D 3
+#define GBREND_RAY 4
 
 #define GBTXT_NONE 0
 #define GBTXT_BITMAP 1
 #define GBTXT_VITA2D 2
 #define GBTXT_FONTCACHE 3
+#define GBTXT_RAY 4
 
 #define GBNET_NONE 0
 #define GBNET_CURL 1
@@ -48,7 +50,7 @@
 #define DOFIXCOORDS 1
 
 // if 1, wait 1 millisecond at the end of the frame if it took less than a millisecond.
-#define CAPHUGEFPS 0
+#define CAPHUGEFPS 1
 
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	#define GBREND GBREND_SDL

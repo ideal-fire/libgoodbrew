@@ -1,15 +1,18 @@
 #include <goodbrew/config.h>
 #include <goodbrew/controls.h>
+#include <stdio.h>
 #include <string.h>
 
 int touchX=-1;
 int touchY=-1;
 int mouseScroll=-1;
+char lastClickWasRight;
 
 char currentPad[NUMBUTTONS];
 char lastPad[NUMBUTTONS];
-char buttonAlias[NUMBUTTONS];
+int buttonAlias[NUMBUTTONS];
 
+extern void XOutFunction();
 #if GBPLAT == GB_VITA
 	#include <psp2/ctrl.h>
 	#include <psp2/touch.h>
@@ -22,25 +25,67 @@ char buttonAlias[NUMBUTTONS];
 	#include <SDL2/SDL_keycode.h>
 	#include <goodbrew/graphics.h> // For screen width and height
 	SDL_Keycode lastSDLPressedKey=SDLK_UNKNOWN;
-	extern void XOutFunction();
-	char lastClickWasRight;
+#elif GBREND == GBREND_RAY
+	#include <goodbrew/graphics.h> // For screen width and height
+	#include <raylib.h>
 #endif
 
 // so we can assign to a char
 #define TOBOOL(x) ((x)>0)
 
 //////////////////////////////////////////////////////////
+#if GBREND == GBREND_RAY
+	int buttonToRayMap[NUMBUTTONS]={
+		0,
+		KEY_X, //a
+		KEY_Z,
+		KEY_S, //x
+		KEY_A,
+		KEY_L,
+		KEY_R,
+		KEY_UP,
+		KEY_DOWN,
+		KEY_LEFT,
+		KEY_RIGHT,
+		KEY_ENTER, // start
+		KEY_E,
+		0, // touch
+		0, // scroll
+		0, // back
+		0, //resize		
+	};
+#endif
 int fixButtonAlias(crossButton _passedButton){
 	if (buttonAlias[_passedButton]!=0){
 		return buttonAlias[_passedButton];
 	}
 	return _passedButton;
 }
-void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
-	crossButton _realButton = fixButtonAlias(_passedButton);
-	currentPad[_realButton]=_newCurStatus;
-	lastPad[_realButton]=_newLastStatus;
-}
+#if GBREND == GBREND_RAY
+	#ifdef NATHANRAYLIBFORK
+		void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
+			crossButton _aliased = fixButtonAlias(_passedButton);
+			if (buttonToRayMap[_aliased]){
+				_aliased=buttonToRayMap[_aliased];
+				rayCurrentKeyState[_aliased]=_newCurStatus;
+				rayPrevKeyState[_aliased]=_newLastStatus;
+			}else{
+				currentPad[_aliased]=_newCurStatus;
+				lastPad[_aliased]=_newLastStatus;
+			}
+		}
+	#else
+		void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
+			puts("doesnt work");
+		}
+	#endif
+#else
+	void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
+		crossButton _realButton = fixButtonAlias(_passedButton);
+		currentPad[_realButton]=_newCurStatus;
+		lastPad[_realButton]=_newLastStatus;
+	}	
+#endif
 void setJustPressed(crossButton _passedButton){
 	lowSetButtonState(_passedButton,1,0);
 }
@@ -165,18 +210,18 @@ void controlsStart(){
 		hidScanInput();
 		u32 _pad = hidKeysHeld();
 		
-		currentPad[BUTTON_A] 		= TOBOOL(_pad & KEY_A)
-		currentPad[BUTTON_B] 		= TOBOOL(_pad & KEY_B)
-		currentPad[BUTTON_X] 		= TOBOOL(_pad & KEY_X)
-		currentPad[BUTTON_Y] 		= TOBOOL(_pad & KEY_Y)
-		currentPad[BUTTON_L] 		= TOBOOL(_pad & KEY_L)
-		currentPad[BUTTON_R] 		= TOBOOL(_pad & KEY_R)
-		currentPad[BUTTON_UP] 		= TOBOOL(_pad & KEY_UP)
-		currentPad[BUTTON_DOWN] 	= TOBOOL(_pad & KEY_DOWN)
-		currentPad[BUTTON_LEFT] 	= TOBOOL(_pad & KEY_LEFT)
-		currentPad[BUTTON_RIGHT] 	= TOBOOL(_pad & KEY_RIGHT)
-		currentPad[BUTTON_START] 	= TOBOOL(_pad & KEY_START)
-		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_SELECT)
+		currentPad[BUTTON_A] 		= TOBOOL(_pad & KEY_A);
+		currentPad[BUTTON_B] 		= TOBOOL(_pad & KEY_B);
+		currentPad[BUTTON_X] 		= TOBOOL(_pad & KEY_X);
+		currentPad[BUTTON_Y] 		= TOBOOL(_pad & KEY_Y);
+		currentPad[BUTTON_L] 		= TOBOOL(_pad & KEY_L);
+		currentPad[BUTTON_R] 		= TOBOOL(_pad & KEY_R);
+		currentPad[BUTTON_UP] 		= TOBOOL(_pad & KEY_UP);
+		currentPad[BUTTON_DOWN] 	= TOBOOL(_pad & KEY_DOWN);
+		currentPad[BUTTON_LEFT] 	= TOBOOL(_pad & KEY_LEFT);
+		currentPad[BUTTON_RIGHT] 	= TOBOOL(_pad & KEY_RIGHT);
+		currentPad[BUTTON_START] 	= TOBOOL(_pad & KEY_START);
+		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_SELECT);
 	#elif GBPLAT == GB_SWITCH
 		hidScanInput();
 		u64 _pad = hidKeysHeld(CONTROLLER_P1_AUTO);
@@ -194,8 +239,26 @@ void controlsStart(){
 		currentPad[BUTTON_START] 	= TOBOOL(_pad & KEY_PLUS);
 		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_MINUS);
 	#elif GBREND == GBREND_SDL
-		// This is only a function because I don't want all this messy code here
 		_readSDLControls();
+	#elif GBREND == GBREND_RAY
+		if ((currentPad[BUTTON_RESIZE] = IsWindowResized())){
+			_goodbrewRealScreenWidth=GetScreenWidth();
+			_goodbrewRealScreenHeight=GetScreenHeight();
+		}
+		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) || (GBPLAT==GB_ANDROID && GetTouchPointsCount()!=0)){
+			currentPad[BUTTON_TOUCH]=1;
+			lastClickWasRight=0;
+		}else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
+			currentPad[BUTTON_TOUCH]=1;
+			lastClickWasRight=1;
+		}else{
+			currentPad[BUTTON_TOUCH]=0;
+		}
+		touchX=GetTouchX();
+		touchY=GetTouchY();
+		if (WindowShouldClose()){
+			XOutFunction();
+		}
 	#else
 		#warning no control code for this setup
 	#endif
@@ -209,19 +272,42 @@ char controlsInit(){
 	#endif
 	return 0;
 }
+//
 char wasJustReleased(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
+	#if GBREND == GBREND_RAY
+		if (buttonToRayMap[_aliased]){
+			return IsKeyReleased(buttonToRayMap[_aliased]);
+		}
+	#endif
 	return lastPad[_aliased] && !currentPad[_aliased];
 }
 char wasJustPressed(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
+	#if GBREND == GBREND_RAY
+		if (buttonToRayMap[_aliased]){
+			return IsKeyPressed(buttonToRayMap[_aliased]);
+		}
+	#endif
 	return !lastPad[_aliased] && currentPad[_aliased];
 }
 char isDown(crossButton _passedButton){
-	return currentPad[fixButtonAlias(_passedButton)];
+	crossButton _aliased = fixButtonAlias(_passedButton);
+	#if GBREND == GBREND_RAY
+		if (buttonToRayMap[_aliased]){
+			return IsKeyDown(buttonToRayMap[_aliased]);
+		}
+	#endif
+	return currentPad[_aliased];
 }
 char wasIsDown(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
+	#if GBREND == GBREND_RAY
+		if (buttonToRayMap[_aliased]){
+			_aliased=buttonToRayMap[_aliased];
+			return IsKeyDown(_aliased) || IsKeyPressed(_aliased);
+		}
+	#endif
 	return currentPad[_aliased] || lastPad[_aliased];
 }
 

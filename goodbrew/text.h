@@ -16,7 +16,7 @@ typedef struct goodbrewfont* crossFont;
 
 double getResonableFontSize(char _passedType);
 void freeFont(crossFont _passedFont);
-void gbDrawTextAlpha(crossFont _passedFont, int x, int y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void gbDrawTextAlpha(crossFont _passedFont, float x, float y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void gbDrawTextf(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, const char* _formatString, ...);
 void gbDrawTextfCenter(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, int _containerW, const char* _formatString, ...);
 void gbDrawText(crossFont _passedFont, int x, int y, const char* text, unsigned char r, unsigned char g, unsigned char b);

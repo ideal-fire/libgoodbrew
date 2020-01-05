@@ -16,6 +16,9 @@
 	#include <sf2d.h>
 	#include <sfil.h>
 	#include <3ds/svc.h>
+#elif GBREND == GBREND_RAY
+	#include <raylib.h>
+	static Color _raylibClearColor;
 #endif
 
 // Used to fix touch coords on Android.
@@ -35,7 +38,7 @@ GETTERFUNC(gbGetDrawOffY,int,_goodbrewDrawOffY);
 SETTERFUNC(gbSetDrawOffX,int,_goodbrewDrawOffX);
 SETTERFUNC(gbSetDrawOffY,int,_goodbrewDrawOffY);
 
-void FixCoords(int* _x, int* _y){
+void FixCoords(float* _x, float* _y){
 	*_x=*_x+_goodbrewDrawOffX;
 	*_y=*_y+_goodbrewDrawOffY;
 	#if DOFIXCOORDS == 1
@@ -52,6 +55,8 @@ int getScreenHeight(){
 void setWindowTitle(char* _newTitle){
 	#if GBREND == GBREND_SDL
 		SDL_SetWindowTitle(mainWindow,_newTitle);
+	#elif GBREND == GBREND_RAY
+		SetWindowTitle(_newTitle);
 	#endif
 }
 void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
@@ -124,6 +129,18 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 		sf2d_init();
 		_windowWidth=400;
 		_windowHeight=240;
+	#elif GBREND == GBREND_RAY
+		SetConfigFlags(FLAG_MSAA_4X_HINT);
+		int _windowFlags=0;
+		if (GBPLAT==GB_ANDROID || _passedFlags & WINDOWFLAG_FULLSCREEN){
+			_windowFlags|=FLAG_FULLSCREEN_MODE;
+		}
+		if (_passedFlags & WINDOWFLAG_RESIZABLE){
+			_windowFlags|=FLAG_WINDOW_RESIZABLE;
+		}
+		_windowFlags|=FLAG_VSYNC_HINT;
+		SetConfigFlags(_windowFlags);
+		InitWindow(_windowWidth,_windowHeight,"TestWindow");
 	#else
 		#error Forgot to make graphics init function
 	#endif
@@ -144,6 +161,9 @@ void startDrawing(){
 		#endif
 	#elif GBREND == GBREND_SF2D
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+	#elif GBREND == GBREND_RAY
+		BeginDrawing();
+		ClearBackground(_raylibClearColor);
 	#endif
 }
 
@@ -163,6 +183,8 @@ void endDrawing(){
 	#elif GBREND == GBREND_SF2D
 		sf2d_end_frame();
 		sf2d_swapbuffers();
+	#elif GBREND == GBREND_RAY
+		EndDrawing();
 	#endif
 }
 #if GBREND == GBREND_SF2D
@@ -177,6 +199,8 @@ void quitGraphics(){
 		// TODO - vita2d quit
 	#elif GBREND == GBREND_SDL
 		// TODO - SDL quit
+	#elif GBREND == GBREND_RAY
+		CloseWindow();
 	#endif
 }
 void setClearColor(int r, int g, int b){
@@ -186,6 +210,11 @@ void setClearColor(int r, int g, int b){
 		vita2d_set_clear_color(RGBA8(r, g, b, 255));
 	#elif GBREND == GBREND_SF2D
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
+	#elif GBREND == GBREND_RAY
+		_raylibClearColor.r=r;
+		_raylibClearColor.g=g;
+		_raylibClearColor.b=b;
+		_raylibClearColor.a=255;
 	#endif
 	_goodbrewClearR=r;
 	_goodbrewClearG=g;
@@ -216,9 +245,16 @@ void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 		SDL_SetRenderDrawColor(mainWindowRenderer,oldr,oldg,oldb,olda);
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_rectangle(x,y,w,h,RGBA8(r,g,b,a));
+	#elif GBREND == GBREND_RAY
+		Color c;
+		c.r=r;
+		c.g=g;
+		c.b=b;
+		c.a=a;
+		DrawRectangle(x,y,w,h,c);
 	#endif
 }
-void drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
+void drawRectangle(float x, float y, int w, int h, int r, int g, int b, int a){
 	EASYFIXCOORDS(&x,&y);
 	_drawRectangle(x,y,w,h,r,g,b,a);
 }
