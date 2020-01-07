@@ -27,7 +27,7 @@ extern void XOutFunction();
 	SDL_Keycode lastSDLPressedKey=SDLK_UNKNOWN;
 #elif GBREND == GBREND_RAY
 	#include <goodbrew/graphics.h> // For screen width and height
-	#include <raylib.h>
+	#include <rayn.h>
 #endif
 
 // so we can assign to a char

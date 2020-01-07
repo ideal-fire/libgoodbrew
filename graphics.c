@@ -17,7 +17,7 @@
 	#include <sfil.h>
 	#include <3ds/svc.h>
 #elif GBREND == GBREND_RAY
-	#include <raylib.h>
+	#include <rayn.h>
 	static Color _raylibClearColor;
 #endif
 

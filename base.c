@@ -25,7 +25,7 @@
 	FS_Archive _sdArchive=0;
 #endif
 #if GBREND == GBREND_RAY
-	#include <raylib.h>
+	#include <rayn.h>
 	#define RAYLIBHDTIMERES 10000
 #endif
 void generalGoodInit(){

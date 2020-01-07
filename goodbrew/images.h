@@ -15,7 +15,7 @@ extern "C" {
 	#include <sf2d.h>
 	typedef sf2d_texture* crossTexture;
 #elif GBREND == GBREND_RAY
-	#include <raylib.h>
+	#include <rayn.h>
 	typedef Texture2D* crossTexture;
 #endif
 

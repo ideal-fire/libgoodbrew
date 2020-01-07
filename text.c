@@ -12,7 +12,7 @@
 #elif GBTXT == GBTXT_VITA2D
 	#include <vita2d.h>
 #elif GBTXT == GBTXT_RAY
-	#include <raylib.h>
+	#include <rayn.h>
 	#define RAYTXTCHARSPACING 1
 #endif
 
