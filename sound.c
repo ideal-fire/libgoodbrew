@@ -1,21 +1,17 @@
 #include <goodbrew/config.h>
 #include <goodbrew/sound.h>
-
 #if GBSND == GBSND_SOLOUD
 	Soloud* mySoLoudEngine;
 #endif
-
 #if GBSND == GBSND_VITA
 	#include "VitaSoundCode.h"
 #endif
-
 char mp3Supported(){
 	return (GBSND == GBSND_SDL || GBSND == GBSND_VITA);
 }
 char oggSupported(){
 	return (GBSND==GBSND_SDL || GBSND==GBSND_SOLOUD || GBSND==GBSND_3DS || GBSND==GBSND_VITA);
 }
-
 // Returns not 0 if didn't work
 char initAudio(){
 	#if GBSND == GBSND_SDL
@@ -69,7 +65,7 @@ void setMusicVolume(crossPlayHandle _passedMusic,int vol){
 		mlgsnd_setVolume(_passedMusic,vol); // On the 128 scale already
 	#endif
 }
-void setMusicVolumeBefore(crossMusic _passedMusic,int vol){
+void setMusicVolumeBefore(crossMusic* _passedMusic,int vol){
 	#if GBSND == GBSND_SDL
 		Mix_VolumeMusic(vol);
 	#elif GBSND == GBSND_SOLOUD
@@ -80,7 +76,7 @@ void setMusicVolumeBefore(crossMusic _passedMusic,int vol){
 		setMusicVolume(_passedMusic,vol);
 	#endif
 }
-void setSFXVolumeBefore(crossSE tochange, int toval){
+void setSFXVolumeBefore(crossSE* tochange, int toval){
 	#if GBSND == GBSND_SDL
 		Mix_VolumeChunk(tochange,toval);
 	#elif GBSND == GBSND_SOLOUD
@@ -128,7 +124,7 @@ void fadeoutMusic(crossPlayHandle _passedHandle,int time){
 		mlgsnd_fadeoutMusic(_passedHandle,time);
 	#endif
 }
-crossSE loadSound(char* filepath){
+crossSE* loadSound(char* filepath){
 	#if GBSND == GBSND_SDL
 		return Mix_LoadWAV(filepath);
 	#elif GBSND == GBSND_SOLOUD
@@ -145,7 +141,7 @@ crossSE loadSound(char* filepath){
 		return 0;
 	#endif
 }
-crossMusic loadMusic(char* filepath){
+crossMusic* loadMusic(char* filepath){
 	#if GBSND == GBSND_SDL
 		return Mix_LoadMUS(filepath);
 	#elif GBSND == GBSND_SOLOUD
@@ -176,7 +172,7 @@ void stopMusic(crossPlayHandle toStop){
 		mlgsnd_stopMusic(toStop);
 	#endif
 }
-void stopSound(crossSE toStop){
+void stopSound(crossSE* toStop){
 	#if GBSND == GBSND_SDL
 		//#warning CANT STOP SOUND WITH SDL_MIXER
 	#elif GBSND == GBSND_SOLOUD
@@ -187,7 +183,7 @@ void stopSound(crossSE toStop){
 		stopMusic(toStop);
 	#endif
 }
-crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel){
+crossPlayHandle playSound(crossSE* toPlay, unsigned char _passedChannel){
 	#if GBSND == GBSND_SDL
 		return Mix_PlayChannel( -1, toPlay, 0 );
 	#elif GBSND == GBSND_SOLOUD
@@ -203,7 +199,7 @@ crossPlayHandle playSound(crossSE toPlay, unsigned char _passedChannel){
 		return 0;
 	#endif
 }
-crossPlayHandle playMusic(crossMusic toPlay, unsigned char _passedChannel){
+crossPlayHandle playMusic(crossMusic* toPlay, unsigned char _passedChannel){
 	#if GBSND == GBSND_SDL
 		Mix_PlayMusic(toPlay,-1);
 		return -1;
@@ -219,7 +215,7 @@ crossPlayHandle playMusic(crossMusic toPlay, unsigned char _passedChannel){
 		return 1;
 	#endif
 }
-void freeSound(crossSE toFree){
+void freeSound(crossSE* toFree){
 	#if GBSND == GBSND_SDL
 		Mix_FreeChunk(toFree);
 	#elif GBSND == GBSND_SOLOUD
@@ -231,7 +227,7 @@ void freeSound(crossSE toFree){
 		mlgsnd_freeMusic(toFree);
 	#endif
 }
-void freeMusic(crossMusic toFree){
+void freeMusic(crossMusic* toFree){
 	#if GBSND == GBSND_SDL
 		Mix_FreeMusic(toFree);
 	#elif GBSND == GBSND_SOLOUD

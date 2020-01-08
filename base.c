@@ -116,7 +116,7 @@ signed char checkFileExist(const char* location){
 			return 1;
 		}
 	#elif GBREND == GBREND_SDL
-		crossFile _potentialFile = crossfopen(location,"rb");
+		crossFile* _potentialFile = crossfopen(location,"rb");
 		if (_potentialFile){
 			crossfclose(_potentialFile);
 			return 1;
@@ -276,7 +276,7 @@ void removeNewline(char* _toRemove){
 		}
 	}
 }
-size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile stream){
+size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile* stream){
 	#if GBPLAT == GB_VITA
 		size_t _writtenElements = fwrite(buffer,size,count,stream->fp);
 		if (_writtenElements==0 && count!=0 && feof(stream->fp)==0){
@@ -292,7 +292,7 @@ size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile stream){
 	#endif
 }
 // Returns number of elements read
-size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){
+size_t crossfread(void* buffer, size_t size, size_t count, crossFile* stream){
 	#if GBPLAT == GB_VITA
 		size_t _readElements = fread(buffer,size,count,stream->fp);
 		if (_readElements==0 && count!=0 && feof(stream->fp)==0){
@@ -307,7 +307,7 @@ size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream){
 		return fread(buffer,size,count,stream);
 	#endif
 }
-crossFile crossfopen(const char* filename, const char* mode){
+crossFile* crossfopen(const char* filename, const char* mode){
 	#if GBPLAT == GB_VITA
 		FILE* fp = fopen(filename,mode);
 		if (fp!=NULL){
@@ -327,7 +327,7 @@ crossFile crossfopen(const char* filename, const char* mode){
 }
 // Returns 0 on success.
 // Returns negative number of failure
-int crossfclose(crossFile stream){
+int crossfclose(crossFile* stream){
 	#if GBPLAT == GB_VITA
 		fclose(stream->fp);
 		free(stream->filename);
@@ -340,7 +340,7 @@ int crossfclose(crossFile stream){
 }
 // stream, offset, CROSSFILE_START, CROSSFILE_END, CROSSFILE_CUR
 // Returns 0 if worked
-int crossfseek(crossFile stream, long int offset, int origin){
+int crossfseek(crossFile* stream, long int offset, int origin){
 	int _trueOrigin;
 	if (origin==CROSSFILE_START){
 		#if GBREND == GBREND_SDL
@@ -380,13 +380,13 @@ int crossfseek(crossFile stream, long int offset, int origin){
 	#endif
 }
 // THIS DOES NOT DO EXACTLY WHAT IT SHOULD
-int crossungetc(int c, crossFile stream){
+int crossungetc(int c, crossFile* stream){
 	if (crossfseek(stream,-1,CROSSFILE_CUR)==0){
 		return c;
 	}
 	return EOF;
 }
-long int crossftell(crossFile fp){
+long int crossftell(crossFile* fp){
 	#if GBPLAT == GB_VITA
 		return fp->internalPosition;
 	#elif GBREND == GBREND_SDL
@@ -396,14 +396,14 @@ long int crossftell(crossFile fp){
 	#endif
 }
 // No platform specific code here
-int crossgetc(crossFile fp){
+int crossgetc(crossFile* fp){
 	unsigned char _readChar;
 	if (crossfread(&_readChar,1,1,fp)==0){
 		return EOF;
 	}
 	return _readChar;
 }
-char crossfeof(crossFile fp){
+char crossfeof(crossFile* fp){
 	#if GBPLAT == GB_VITA
 		return feof(fp->fp);
 	#elif GBREND == GBREND_SDL
@@ -418,7 +418,7 @@ char crossfeof(crossFile fp){
 }
 // Checks if the byte is the one for a newline
 // If it's 0D, it seeks past the 0A that it assumes is next and returns 1
-signed char isNewLine(crossFile fp, unsigned char _temp){
+signed char isNewLine(crossFile* fp, unsigned char _temp){
 	if (_temp==0x0D){
 		crossfseek(fp,1,CROSSFILE_CUR);
 		return 1;

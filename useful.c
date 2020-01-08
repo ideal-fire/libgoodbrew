@@ -47,7 +47,7 @@ ssize_t goodbrewGetDelim(char** lineptr, size_t* n, int delim, void* stream, cha
 	(*lineptr)[_currentPos]='\0';
 	return _currentPos;
 }
-ssize_t crossgetline(char** lineptr, size_t* n, crossFile stream){
+ssize_t crossgetline(char** lineptr, size_t* n, crossFile* stream){
 	return goodbrewGetDelim(lineptr,n,'\n',stream,1);
 }
 #if !(_POSIX_C_SOURCE >= 200809L)
@@ -67,7 +67,7 @@ const char* findCharBackwards(const char* _startHere, const char* _endHere, int 
 	}while(_startHere>_endHere);
 	return NULL;
 }
-int crossReadInt(crossFile fp){
+int crossReadInt(crossFile* fp){
 	char _readBuff[11];
 	int _curPos=0;
 	int _curChar;
@@ -81,7 +81,7 @@ int crossReadInt(crossFile fp){
 	_readBuff[_curPos]='\0';
 	return atoi(_readBuff);
 }
-char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
+char readABit(crossFile* fp, char* _destBuffer, long* _numRead, long _maxRead){
 	if (crossfeof(fp)){
 		return 1;
 	}
@@ -89,9 +89,9 @@ char readABit(crossFile fp, char* _destBuffer, long* _numRead, long _maxRead){
 	return 0;
 }
 void lowCopyFile(const char* _srcPath, const char* _destPath, char _canMakeDirs){
-	crossFile _destfp = crossfopen(_destPath,"wb");
+	crossFile* _destfp = crossfopen(_destPath,"wb");
 	if (_destfp!=NULL){
-		crossFile _sourcefp = crossfopen(_srcPath,"rb");
+		crossFile* _sourcefp = crossfopen(_srcPath,"rb");
 		if (_sourcefp!=NULL){
 			char* _currentBit = malloc(COPYBUFF);
 			long _lastRead;
@@ -161,7 +161,7 @@ char* easySprintf( const char* _stringFormat, ... ) {
 	va_start(_tempArgs, _stringFormat);
 	return formatf(_tempArgs,_stringFormat);
 }
-void seekPast(crossFile fp, unsigned char _target){
+void seekPast(crossFile* fp, unsigned char _target){
 	while (1){
 		int _lastRead = crossgetc(fp);
 		if (_lastRead==_target || _lastRead==EOF){
@@ -169,10 +169,10 @@ void seekPast(crossFile fp, unsigned char _target){
 		}
 	}
 }
-void seekNextLine(crossFile fp){
+void seekNextLine(crossFile* fp){
 	seekPast(fp,0x0A);
 }
-char* fancyReadLine(crossFile fp){
+char* fancyReadLine(crossFile* fp){
 	char* _tempReadLine = NULL;
 	size_t _tempReadLength = 0;
 	if (crossgetline(&_tempReadLine,&_tempReadLength,fp)!=0){

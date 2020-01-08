@@ -1,4 +1,4 @@
-#define GBVERSION 6
+#define GBVERSION 7
 
 #define GB_LINUX 1
 #define GB_WINDOWS 2
@@ -56,7 +56,7 @@
 	#define GBREND GBREND_SDL
 	#define GBTXT GBTXT_FONTCACHE
 	#define GBSND GBSND_SDL
-	#define GBNET GBNET_NONE
+	#define GBNET GBNET_CURL
 #elif GBPLAT == GB_VITA
 	#define GBREND GBREND_VITA2D
 	#define GBTXT GBTXT_VITA2D

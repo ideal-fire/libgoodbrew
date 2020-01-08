@@ -34,7 +34,7 @@ struct bitmapFontLetter{
 };
 
 struct loadedBitmapFont{
-	crossTexture internalImage;
+	crossTexture* internalImage;
 	struct bitmapFontLetter* letterInfos;
 	short numLetters;
 	short firstLetter;
@@ -61,7 +61,7 @@ double getResonableFontSize(char _passedType){
 		return 32;
 	#endif
 }
-void freeFont(crossFont _passedFont){
+void freeFont(crossFont* _passedFont){
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		freeTexture(_castPassed->internalImage);
@@ -79,13 +79,13 @@ void freeFont(crossFont _passedFont){
 	}
 	free(_passedFont);
 }
-crossFont loadFont(const char* filename, double _passedSize){
+crossFont* loadFont(const char* filename, double _passedSize){
 	struct goodbrewfont* _retFont = malloc(sizeof(struct goodbrewfont));
 	int _cachedstrlen = strlen(filename);
 	if (_cachedstrlen>=4 && strcmp(&(filename[_cachedstrlen-4]),".sfl")==0){
 		_retFont->type = GBTXT_BITMAP;
 		//https://github.com/andryblack/fontbuilder/blob/24459633c531f2316c7c3eed1fee5ef87ac8bda0/src/exporters/simpleexporter.cpp
-		crossFile fp = crossfopen(filename,"r");
+		crossFile* fp = crossfopen(filename,"r");
 		if (fp!=NULL){
 			struct loadedBitmapFont* _retBitmapFont = malloc(sizeof(struct loadedBitmapFont));
 
@@ -191,7 +191,7 @@ crossFont loadFont(const char* filename, double _passedSize){
 	}
 	return _retFont;
 }
-int textHeight(crossFont _passedFont){
+int textHeight(crossFont* _passedFont){
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		return (_castPassed->height*_bitmapFontScaleGet(_castPassed,_passedFont->size));
@@ -207,7 +207,7 @@ int textHeight(crossFont _passedFont){
 	#endif
 }
 // Please always use the same font size
-int textWidth(crossFont _passedFont, const char* message){
+int textWidth(crossFont* _passedFont, const char* message){
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		int _currentWidth=0;
@@ -230,7 +230,7 @@ int textWidth(crossFont _passedFont, const char* message){
 		return _passedFont->size*strlen(message);
 	#endif
 }
-void gbDrawTextAlpha(crossFont _passedFont, float x, float y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+void gbDrawTextAlpha(crossFont* _passedFont, float x, float y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	EASYFIXCOORDS(&x,&y);
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
@@ -266,17 +266,17 @@ void gbDrawTextAlpha(crossFont _passedFont, float x, float y, const char* text, 
 		#endif
 	}
 }
-void gbDrawText(crossFont _passedFont, int x, int y, const char* text, unsigned char r, unsigned char g, unsigned char b){
+void gbDrawText(crossFont* _passedFont, int x, int y, const char* text, unsigned char r, unsigned char g, unsigned char b){
 	gbDrawTextAlpha(_passedFont,x,y,text,r,g,b,255);
 }
-void gbDrawTextf(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, const char* _formatString, ...){
+void gbDrawTextf(crossFont* _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, const char* _formatString, ...){
 	va_list _tempArgs;
 	va_start(_tempArgs, _formatString);
 	char* _completeString = formatf(_tempArgs,_formatString);
 	gbDrawTextAlpha(_passedFont,x,y,_completeString,r,g,b,a);
 	free(_completeString);
 }
-void gbDrawTextfCenter(crossFont _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, int _containerW, const char* _formatString, ...){
+void gbDrawTextfCenter(crossFont* _passedFont, int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a, int _containerW, const char* _formatString, ...){
 	va_list _tempArgs;
 	va_start(_tempArgs, _formatString);
 	char* _completeString = formatf(_tempArgs,_formatString);

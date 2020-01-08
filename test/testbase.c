@@ -10,9 +10,9 @@ int main(int argc, char const *argv[]){
 	generalGoodInit();
 
 	// Test wait and time functions
-	printf("%d\n",getMilli());
+	printf("before waiting: %"PRIu64"\n",getMilli());
 	wait(500);
-	printf("%d\n",getMilli());
+	printf("after waiting: %"PRIu64"\n",getMilli());
 
 	// Test file existance
 	if (checkFileExist("./testbase.c")){
@@ -44,15 +44,15 @@ int main(int argc, char const *argv[]){
 	}
 
 	// Test file
-	crossFile myFile = crossfopen("./testbase.c","rb");
+	crossFile* myFile = crossfopen("./testbase.c","rb");
 	printf("the first 3 chars in any order: %c %c %c\n",crossgetc(myFile),crossgetc(myFile),crossgetc(myFile));
-	printf("3: %d\n",crossftell(myFile));
+	printf("3: %"PRIu64"\n",crossftell(myFile));
 	crossfseek(myFile,-1,CROSSFILE_CUR);
-	printf("2: %d\n",crossftell(myFile));
+	printf("2: %"PRIu64"\n",crossftell(myFile));
 	crossfseek(myFile,0,CROSSFILE_START);
-	printf("0: %d\n",crossftell(myFile));
+	printf("0: %"PRIu64"\n",crossftell(myFile));
 	crossfseek(myFile,0,CROSSFILE_END);
-	printf("filesize: %d\n",crossftell(myFile));
+	printf("filesize: %"PRIu64"\n",crossftell(myFile));
 	crossfclose(myFile);
 
 	generalGoodQuit();

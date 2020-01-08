@@ -23,7 +23,7 @@
 =================================================
 */
 #if GBREND == GBREND_SDL
-	crossTexture surfaceToTexture(SDL_Surface* _tempSurface){
+	SDL_Texture* surfaceToTexture(SDL_Surface* _tempSurface){
 		if (_tempSurface==NULL){
 			printf("_tempSurface is NULL. failed to load image. %s\n",IMG_GetError());
 			return NULL;
@@ -36,7 +36,7 @@
 		SDL_SetTextureBlendMode(_returnTexture, SDL_BLENDMODE_BLEND); // Allow the texture to be drawn translucent
 		return _returnTexture;
 	}
-	void SDLDrawShared(const crossTexture passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint){
+	void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint){
 		unsigned char oldr;
 		unsigned char oldg;
 		unsigned char oldb;
@@ -119,7 +119,7 @@ void initImages(){
 		IMG_Init( IMG_INIT_JPG );
 	#endif
 }
-void enableSmoothScaling(crossTexture _passedTexture){
+void enableSmoothScaling(crossTexture* _passedTexture){
 	#if GBREND == GBREND_VITA2D
 		vita2d_texture_set_filters(_passedTexture,SCE_GXM_TEXTURE_FILTER_LINEAR,SCE_GXM_TEXTURE_FILTER_LINEAR);
 	#elif GBREND == GBREND_RAY
@@ -144,7 +144,7 @@ static char getImageType(unsigned char _magicStart){
 		return 0;
 	}
 }
-crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
+crossTexture* loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
 	switch(getImageType(((char*)_passedBuffer)[0])){
 		case 1:
 			return loadPNGBuffer(_passedBuffer,_passedBufferSize);
@@ -155,8 +155,8 @@ crossTexture loadImageBuffer(void* _passedBuffer, int _passedBufferSize){
 	}
 	return NULL;
 }
-crossTexture loadImage(const char* path){
-	crossFile fp=crossfopen(path,"rb");
+crossTexture* loadImage(const char* path){
+	crossFile* fp=crossfopen(path,"rb");
 	if (fp==NULL){
 		return NULL;
 	}
@@ -172,7 +172,7 @@ crossTexture loadImage(const char* path){
 	}
 	return NULL;
 }
-crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
+crossTexture* loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_PNG_buffer(_passedBuffer);
 	#elif GBREND == GBREND_SDL
@@ -181,7 +181,7 @@ crossTexture loadPNGBuffer(void* _passedBuffer, int _passedBufferSize){
 		return sfil_load_PNG_buffer(_passedBuffer,SF2D_PLACE_RAM);
 	#endif
 }
-crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
+crossTexture* loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_JPEG_buffer(_passedBuffer,_passedBufferSize);
 	#elif GBREND == GBREND_SDL
@@ -190,7 +190,7 @@ crossTexture loadJPGBuffer(void* _passedBuffer, int _passedBufferSize){
 		return sfil_load_JPEG_buffer(_passedBuffer,_passedBufferSize,SF2D_PLACE_RAM);
 	#endif
 }
-crossTexture loadBMPBuffer(void* _passedBuffer, int _passedBufferSize){
+crossTexture* loadBMPBuffer(void* _passedBuffer, int _passedBufferSize){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_BMP_buffer(_passedBuffer);
 	#elif GBREND == GBREND_SDL
@@ -199,7 +199,7 @@ crossTexture loadBMPBuffer(void* _passedBuffer, int _passedBufferSize){
 		return sfil_load_BMP_buffer(path,SF2D_PLACE_RAM);
 	#endif
 }
-crossTexture loadPNG(const char* path){
+crossTexture* loadPNG(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_PNG_file(path);
 	#elif GBREND == GBREND_SDL
@@ -212,7 +212,7 @@ crossTexture loadPNG(const char* path){
 		return _ret;
 	#endif
 }
-crossTexture loadJPG(const char* path){
+crossTexture* loadJPG(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_JPEG_file(path);
 	#elif GBREND == GBREND_SF2D
@@ -221,7 +221,7 @@ crossTexture loadJPG(const char* path){
 		return loadPNG(path);
 	#endif
 }
-crossTexture loadBMP(const char* path){
+crossTexture* loadBMP(const char* path){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_load_BMP_file(path);
 	#elif GBREND == GBREND_SDL
@@ -232,7 +232,7 @@ crossTexture loadBMP(const char* path){
 		return loadPNG(path);
 	#endif
 }
-void freeTexture(crossTexture passedTexture){
+void freeTexture(crossTexture* passedTexture){
 	if (passedTexture==NULL){
 		printf("Don't free NULL textures.");
 		return;
@@ -250,7 +250,7 @@ void freeTexture(crossTexture passedTexture){
 		free(passedTexture);
 	#endif
 }
-int getTextureWidth(const crossTexture passedTexture){
+int getTextureWidth(crossTexture* passedTexture){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_texture_get_width(passedTexture);
 	#elif GBREND == GBREND_SDL
@@ -263,7 +263,7 @@ int getTextureWidth(const crossTexture passedTexture){
 		return passedTexture->width;
 	#endif
 }
-int getTextureHeight(const crossTexture passedTexture){
+int getTextureHeight(crossTexture* passedTexture){
 	#if GBREND == GBREND_VITA2D
 		return vita2d_texture_get_height(passedTexture);
 	#elif GBREND == GBREND_SDL
@@ -277,7 +277,7 @@ int getTextureHeight(const crossTexture passedTexture){
 	#endif
 }
 // Zero modifiers
-void drawTexture(const crossTexture passedTexture, float destX, float destY){
+void drawTexture(crossTexture* passedTexture, float destX, float destY){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture(passedTexture,destX,destY);
@@ -290,7 +290,7 @@ void drawTexture(const crossTexture passedTexture, float destX, float destY){
 	#endif
 }
 // One modifier
-void drawTextureSized(const crossTexture passedTexture, float destX, float destY, int destW, int destH){
+void drawTextureSized(crossTexture* passedTexture, float destX, float destY, int destW, int destH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_sized(passedTexture,destX,destY,destW,destH);
@@ -302,7 +302,7 @@ void drawTextureSized(const crossTexture passedTexture, float destX, float destY
 		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,WHITE);
 	#endif
 }
-void drawTextureAlpha(const crossTexture passedTexture, float destX, float destY, unsigned char alpha){
+void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, unsigned char alpha){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
@@ -319,11 +319,11 @@ void drawTextureAlpha(const crossTexture passedTexture, float destX, float destY
 		DrawTexture(*passedTexture,destX,destY,_c);
 	#endif
 }
-void drawTextureScaled(const crossTexture passedTexture, float destX, float destY, double _scaleFactor){
+void drawTextureScaled(crossTexture* passedTexture, float destX, float destY, double _scaleFactor){
 	drawTextureSized(passedTexture,destX,destY,getTextureWidth(passedTexture)*_scaleFactor,getTextureHeight(passedTexture)*_scaleFactor);
 }
 // Two modifiers
-void drawTexturePartSized(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH){
+void drawTexturePartSized(crossTexture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH);
@@ -335,7 +335,7 @@ void drawTexturePartSized(const crossTexture passedTexture, float destX, float d
 		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,WHITE);
 	#endif
 }
-void drawTextureSizedAlpha(const crossTexture passedTexture, float _drawX, float _drawY, int _scaledW, int _scaledH, unsigned char alpha){
+void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _drawY, int _scaledW, int _scaledH, unsigned char alpha){
 	EASYFIXCOORDS(&_drawX,&_drawY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,_drawX,_drawY,_scaledW,_scaledH,RGBA8(255,255,255,alpha));
@@ -352,7 +352,7 @@ void drawTextureSizedAlpha(const crossTexture passedTexture, float _drawX, float
 		rayDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,_c);
 	#endif
 }
-void drawTextureSizedTint(const crossTexture passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
+void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,destX,destY,destW,destH,RGBA8(r,g,b,255));
@@ -370,7 +370,7 @@ void drawTextureSizedTint(const crossTexture passedTexture, float destX, float d
 	#endif
 }
 // Three modifiers
-void drawTexturePartSizedAlpha(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha){
+void drawTexturePartSizedAlpha(crossTexture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char alpha){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(255,255,255,alpha));
@@ -388,7 +388,7 @@ void drawTexturePartSizedAlpha(const crossTexture passedTexture, float destX, fl
 	#endif
 }
 // All four modifiers
-void drawTexturePartSizedTintAlpha(const crossTexture passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+void drawTexturePartSizedTintAlpha(crossTexture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(r,g,b,a));

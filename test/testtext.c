@@ -7,23 +7,19 @@
 #include <goodbrew/graphics.h>
 #include <goodbrew/text.h>
 
-int fixX(int a){
+float fixX(float a){
 	return a;
 }
-int fixY(int a){
+float fixY(float a){
 	return a;
 }
-
 int main(int argc, char const *argv[]){
 	generalGoodInit();
+	initGraphics(640,480,0);
 
-	int _realWidth;
-	int _realHeight;
-	initGraphics(640,480,&_realWidth,&_realHeight);
-
-	crossFont loadedSimpleBitmap = loadFont("./vincent-font.sfl",getResonableFontSize(GBTXT_BITMAP));
-	crossFont loadedFancyBitmap = loadFont("./liberation-sans-bitmap.sfl",-1);
-	crossFont loadedFancyFont = loadFont("./LiberationSans.ttf",getResonableFontSize(GBTXT));
+	crossFont* loadedSimpleBitmap = loadFont("./vincent-font.sfl",getResonableFontSize(GBTXT_BITMAP));
+	crossFont* loadedFancyBitmap = loadFont("./liberation-sans-bitmap.sfl",-1);
+	crossFont* loadedFancyFont = loadFont("./LiberationSans.ttf",getResonableFontSize(GBTXT));
 	
 	startDrawing();
 	gbDrawText(loadedSimpleBitmap, 0, 0, "Simple bitmap font", 255,255,255);

@@ -7,19 +7,19 @@
 #include <goodbrew/graphics.h>
 #include <goodbrew/images.h>
 
-
+float fixX(float a){
+	return a;
+}
+float fixY(float a){
+	return a;
+}
 int main(int argc, char const *argv[]){
 	generalGoodInit();
-
-	int _realWidth;
-	int _realHeight;
-	initGraphics(640,480,&_realWidth,&_realHeight);
+	initGraphics(640,480,0);
 	initImages();
 	setWindowTitle("Test happy");
 
-	crossTexture mytex = loadPNG("./test.png");
-	
-
+	crossTexture* mytex = loadPNG("./test.png");
 	if (mytex==NULL){
 		printf("oh\n");
 	}

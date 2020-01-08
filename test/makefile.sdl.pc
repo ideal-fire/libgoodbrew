@@ -1,0 +1,24 @@
+src = $(wildcard *.c)
+obj = $(src:.c=.out)
+
+CFLAGS = -L.. -I.. -L. -lgoodbrew -lm -lpthread -lSDL2_image -lSDL2_ttf -lSDLFontCache -lSDL2_mixer `sdl2-config --cflags --libs` -Llib -ldl -g -Wall `sdl2-config --cflags`
+
+all: testbase testcontrols testgfx testimages testpaths testtext
+
+testbase: testbase.c
+	$(CC) testbase.c $(CFLAGS) -o testbase.out
+
+testcontrols: testcontrols.c
+	$(CC) testcontrols.c $(CFLAGS) -o testcontrols.out
+
+testgfx: testgfx.c
+	$(CC) testgfx.c $(CFLAGS) -o testgfx.out
+
+testimages: testimages.c
+	$(CC) testimages.c $(CFLAGS) -o testimages.out
+
+testpaths: testpaths.c
+	$(CC) testpaths.c $(CFLAGS) -o testpaths.out
+
+testtext: testtext.c
+	$(CC) testtext.c $(CFLAGS) -o testtext.out

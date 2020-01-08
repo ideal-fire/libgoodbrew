@@ -43,14 +43,14 @@ enum corssFileSeekPoint{
 		int internalPosition;
 		FILE* fp;
 	}vitaFile;
-	typedef vitaFile* crossFile;
+	typedef vitaFile crossFile;
 
 	#include <psp2/types.h>
 	#include <dirent.h>
 #elif GBREND == GBREND_SDL
-	typedef SDL_RWops* crossFile;
+	typedef SDL_RWops crossFile;
 #else
-	typedef FILE* crossFile;
+	typedef FILE crossFile;
 #endif
 
 //////////////////////////////
@@ -74,15 +74,15 @@ enum corssFileSeekPoint{
 //////////////////////////////
 signed char checkFileExist(const char* location);
 void createDirectory(const char* path);
-int crossfclose(crossFile stream);
-char crossfeof(crossFile fp);
-crossFile crossfopen(const char* filename, const char* mode);
-size_t crossfread(void* buffer, size_t size, size_t count, crossFile stream);
-size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile stream);
-int crossfseek(crossFile stream, long int offset, int origin);
-long int crossftell(crossFile fp);
-int crossgetc(crossFile fp);
-int crossungetc(int c, crossFile stream);
+int crossfclose(crossFile* stream);
+char crossfeof(crossFile* fp);
+crossFile* crossfopen(const char* filename, const char* mode);
+size_t crossfread(void* buffer, size_t size, size_t count, crossFile* stream);
+size_t crossfwrite(void* buffer, size_t size, size_t count, crossFile* stream);
+int crossfseek(crossFile* stream, long int offset, int origin);
+long int crossftell(crossFile* fp);
+int crossgetc(crossFile* fp);
+int crossungetc(int c, crossFile* stream);
 void directoryClose(crossDir passedir);
 char directoryExists(const char* filepath);
 int directoryRead(crossDir* passedir, crossDirStorage* passedStorage);
@@ -91,10 +91,9 @@ void generalGoodInit();
 void generalGoodQuit();
 char* getDirectoryResultName(crossDirStorage* passedStorage);
 u64 getMilli();
-signed char isNewLine(crossFile fp, unsigned char _temp);
+signed char isNewLine(crossFile* fp, unsigned char _temp);
 crossDir openDirectory(const char* filepath);
 void removeNewline(char* _toRemove);
-void utf2ascii(char* dst, u16* src);
 void wait(int miliseconds);
 u64 getHDTimeRes();
 u64 getHDTime();
