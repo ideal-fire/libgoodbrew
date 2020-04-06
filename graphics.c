@@ -136,13 +136,23 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 			fprintf(stderr,"Could not init Allegro.\n");
 			exit(1);
 		}
+		int f=0;
+		if (_passedFlags & WINDOWFLAG_FULLSCREEN){
+			f|=ALLEGRO_FULLSCREEN;
+		}else{
+			f|=ALLEGRO_WINDOWED;
+		}
+		if (_passedFlags & WINDOWFLAG_RESIZABLE){
+			f|=ALLEGRO_RESIZABLE;
+		}
+		al_set_new_display_flags(f);
 		al_install_mouse();
 		al_install_keyboard();
 		if (!(aDisplay = al_create_display(_windowWidth,_windowHeight))) {
 			fprintf(stderr,"Error creating display\n");
 			exit(1);
 		}
-		_allegroClearColor=al_map_rgb_f(255,255,255);
+		_allegroClearColor=al_map_rgb(255,255,255);
 	#else
 		#error Forgot to make graphics init function
 	#endif
@@ -212,7 +222,7 @@ void setClearColor(int r, int g, int b){
 	#elif GBREND == GBREND_SF2D
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
 	#elif GBREND == GBREND_QUICK
-		_allegroClearColor=al_map_rgb_f(r,g,b);
+		_allegroClearColor=al_map_rgb(r,g,b);
 	#endif
 	_goodbrewClearR=r;
 	_goodbrewClearG=g;

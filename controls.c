@@ -33,6 +33,7 @@ extern void XOutFunction();
 	static int prevMouseBallZ;
 	static ALLEGRO_EVENT_QUEUE* eventQueue;
 	extern ALLEGRO_DISPLAY* aDisplay;
+	#include <goodbrew/graphics.h> // For screen width and height
 #endif
 
 // so we can assign to a char
@@ -165,7 +166,7 @@ void _readSDLControls(){
 #endif
 // It's easiest to do controls this way. There are different ways of storing and reading controls and this makes them all compatible easily.
 void controlsStart(){
-	// TODO - Work on touch for homebrew systems
+	// TODO - Work on touch for homebrew systems that aren't vita
 	currentPad[BUTTON_RESIZE]=0;
 	#if GBPLAT == GB_VITA
 		SceTouchData _curTouch;
@@ -231,6 +232,11 @@ void controlsStart(){
 		while (al_get_next_event(eventQueue, &_curevent)){
 			if (_curevent.type==ALLEGRO_EVENT_DISPLAY_CLOSE){
 				XOutFunction();
+			}else if (_curevent.type==ALLEGRO_EVENT_DISPLAY_RESIZE){
+				al_acknowledge_resize(aDisplay);
+				currentPad[BUTTON_RESIZE]=1;
+				_goodbrewRealScreenWidth=_curevent.display.width;
+				_goodbrewRealScreenHeight=_curevent.display.height;
 			}
 		}
 		
@@ -271,6 +277,8 @@ char controlsInit(){
 		}
 		eventQueue = al_create_event_queue();
 		al_register_event_source(eventQueue,al_get_display_event_source(aDisplay));
+		_goodbrewRealScreenWidth=al_get_display_width(aDisplay);
+		_goodbrewRealScreenHeight=al_get_display_height(aDisplay);
 	#endif
 	return 0;
 }

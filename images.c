@@ -90,6 +90,7 @@ void initImages(){
 		IMG_Init( IMG_INIT_JPG );
 	#elif GBREND == GBREND_QUICK
 		al_init_image_addon();
+		al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 	#endif
 }
 void enableSmoothScaling(crossTexture* _passedTexture){
@@ -333,7 +334,8 @@ void drawTexturePartSizedAlpha(crossTexture* passedTexture, float destX, float d
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
 	#elif GBREND == GBREND_QUICK
-		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(alpha,alpha,alpha,alpha),partX,partY,partW,partH,destX,destY,destW,destH,0);
+		double b=alpha/255;
+		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(1*b,1*b,1*b,b),partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
 }
 // All four modifiers
@@ -347,6 +349,6 @@ void drawTexturePartSizedTintAlpha(crossTexture* passedTexture, float destX, flo
 		//sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale, RGBA8(r,g,b,a));
 	#elif GBREND == GBREND_QUICK
 		//printf("libgoodbrew: lol theres no way this works\n");
-		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(a,a,a,a),partX,partY,partW,partH,destX,destY,destW,destH,0);
+		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(r,g,b,a),partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
 }
