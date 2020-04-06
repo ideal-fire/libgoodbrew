@@ -14,9 +14,6 @@ extern "C" {
 #elif GBREND == GBREND_SF2D
 	#include <sf2d.h>
 	typedef sf2d_texture crossTexture;
-#elif GBREND == GBREND_RAY
-	#include <rayn.h>
-	typedef Texture2D crossTexture;
 #elif GBREND==GBREND_QUICK
 	#include <allegro5/allegro.h>
 	#include <allegro5/allegro_image.h>

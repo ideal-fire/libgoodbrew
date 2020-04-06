@@ -17,14 +17,12 @@
 #define GBREND_VITA2D 1
 #define GBREND_SDL 2
 #define GBREND_SF2D 3
-#define GBREND_RAY 4
 #define GBREND_QUICK 5 // allegro5
 
 #define GBTXT_NONE 0
 #define GBTXT_BITMAP 1
 #define GBTXT_VITA2D 2
 #define GBTXT_FONTCACHE 3
-#define GBTXT_RAY 4
 
 #define GBNET_NONE 0
 #define GBNET_CURL 1

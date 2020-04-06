@@ -83,35 +83,6 @@
 			SDL_SetTextureAlphaMod(passedTexture, olda);
 		}
 	}
-#elif GBREND == GBREND_RAY
-	void rayDrawShared(Texture2D* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, Color tint){
-		Rectangle _srcRect;
-		if (partX==-1){
-			_srcRect.width=getTextureWidth(passedTexture);
-			_srcRect.height=getTextureHeight(passedTexture);
-			_srcRect.x=0;
-			_srcRect.y=0;
-		}else{
-			_srcRect.width=partW;
-			_srcRect.height=partH;
-			_srcRect.x=partX;
-			_srcRect.y=partY;
-		}
-		Rectangle _destRect;
-		if (destW==-1){
-			_destRect.width=_srcRect.width;
-			_destRect.height=_srcRect.height;
-		}else{
-			_destRect.width=destW;
-			_destRect.height=destH;
-		}
-		_destRect.x=destX;
-		_destRect.y=destY;
-		Vector2 _rotateOrigin;
-		_rotateOrigin.x=0;
-		_rotateOrigin.y=0;
-		DrawTexturePro(*passedTexture,_srcRect,_destRect,_rotateOrigin,0,tint);
-	}
 #endif
 void initImages(){
 	#if GBREND == GBREND_SDL
@@ -124,8 +95,6 @@ void initImages(){
 void enableSmoothScaling(crossTexture* _passedTexture){
 	#if GBREND == GBREND_VITA2D
 		vita2d_texture_set_filters(_passedTexture,SCE_GXM_TEXTURE_FILTER_LINEAR,SCE_GXM_TEXTURE_FILTER_LINEAR);
-	#elif GBREND == GBREND_RAY
-		SetTextureFilter(*_passedTexture,FILTER_BILINEAR);
 	#else
 		printf("set smooth scaling unsuported\n");
 	#endif
@@ -208,10 +177,6 @@ crossTexture* loadPNG(const char* path){
 		return surfaceToTexture(IMG_Load(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
-	#elif GBREND == GBREND_RAY
-		Texture2D* _ret = malloc(sizeof(Texture2D));
-		*_ret=LoadTexture(path);
-		return _ret;
 	#elif GBREND == GBREND_QUICK
 		return al_load_bitmap(path);
 	#endif
@@ -221,7 +186,7 @@ crossTexture* loadJPG(const char* path){
 		return vita2d_load_JPEG_file(path);
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
-	#elif GBREND == GBREND_SDL || GBREND == GBREND_RAY || GBREND == GBREND_QUICK
+	#elif GBREND == GBREND_SDL || GBREND == GBREND_QUICK
 		return loadPNG(path);
 	#endif
 }
@@ -232,7 +197,7 @@ crossTexture* loadBMP(const char* path){
 		return surfaceToTexture(SDL_LoadBMP(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_BMP_file(path,SF2D_PLACE_RAM);
-	#elif GBREND == GBREND_RAY || GBREND == GBREND_QUICK
+	#elif GBREND == GBREND_QUICK
 		return loadPNG(path);
 	#endif
 }
@@ -249,9 +214,6 @@ void freeTexture(crossTexture* passedTexture){
 		SDL_DestroyTexture(passedTexture);
 	#elif GBREND == GBREND_SF2D
 		sf2d_free_texture(passedTexture);
-	#elif GBREND == GBREND_RAY
-		UnloadTexture(*passedTexture);
-		free(passedTexture);
 	#elif GBREND == GBREND_QUICK
 		al_destroy_bitmap(passedTexture);
 	#endif
@@ -264,8 +226,6 @@ int getTextureWidth(crossTexture* passedTexture){
 		SDL_QueryTexture(passedTexture, NULL, NULL, &w, &h);
 		return w;
 	#elif GBREND == GBREND_SF2D
-		return passedTexture->width;
-	#elif GBREND == GBREND_RAY
 		return passedTexture->width;
 	#elif GBREND == GBREND_QUICK
 		return al_get_bitmap_width(passedTexture);
@@ -280,8 +240,6 @@ int getTextureHeight(crossTexture* passedTexture){
 		return h;
 	#elif GBREND == GBREND_SF2D
 		return passedTexture->height;
-	#elif GBREND == GBREND_RAY
-		return passedTexture->height;
 	#elif GBREND == GBREND_QUICK
 		return al_get_bitmap_height(passedTexture);
 	#endif
@@ -295,8 +253,6 @@ void drawTexture(crossTexture* passedTexture, float destX, float destY){
 		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture(passedTexture,_destX,_destY);
-	#elif GBREND == GBREND_RAY
-		DrawTexture(*passedTexture,destX,destY,WHITE);
 	#elif GBREND == GBREND_QUICK
 		al_draw_bitmap(passedTexture,destX,destY,0);
 	#endif
@@ -310,8 +266,6 @@ void drawTextureSized(crossTexture* passedTexture, float destX, float destY, int
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale(passedTexture,destX,destY,partXScale,partYScale);
-	#elif GBREND == GBREND_RAY
-		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,WHITE);
 	#elif GBREND == GBREND_QUICK
 		al_draw_scaled_bitmap(passedTexture,0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),destX,destY,destW,destH,0);
 	#endif
@@ -324,13 +278,6 @@ void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, uns
 		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_texture_blend(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
-	#elif GBREND == GBREND_RAY
-		Color _c;
-		_c.r=255;
-		_c.g=255;
-		_c.b=255;
-		_c.a=alpha;
-		DrawTexture(*passedTexture,destX,destY,_c);
 	#elif GBREND == GBREND_QUICK
 		al_draw_tinted_bitmap(passedTexture,al_map_rgba(1,1,1,alpha),destX,destY,0);
 	#endif
@@ -347,8 +294,6 @@ void drawTexturePartSized(crossTexture* passedTexture, float destX, float destY,
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,0,0,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
-	#elif GBREND == GBREND_RAY
-		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,WHITE);
 	#elif GBREND == GBREND_QUICK
 		al_draw_scaled_bitmap(passedTexture,partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
@@ -361,13 +306,6 @@ void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _dra
 		SDLDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(255,255,255,alpha));
-	#elif GBREND == GBREND_RAY
-		Color _c;
-		_c.r=255;
-		_c.g=255;
-		_c.b=255;
-		_c.a=alpha;
-		rayDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,_c);
 	#elif GBREND == GBREND_QUICK
 		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(alpha,alpha,alpha,alpha),0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),_drawX,_drawY,_scaledW,_scaledH,0);
 	#endif
@@ -381,13 +319,6 @@ void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY,
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,255,1,1);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(r,g,b,255));
-	#elif GBREND == GBREND_RAY
-		Color _c;
-		_c.r=r;
-		_c.g=g;
-		_c.b=b;
-		_c.a=255;
-		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,_c);
 	#elif GBREND == GBREND_QUICK
 		drawTexturePartSizedTintAlpha(passedTexture,destX,destY,destW,destH,0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),r,g,b,1);
 	#endif
@@ -401,13 +332,6 @@ void drawTexturePartSizedAlpha(crossTexture* passedTexture, float destX, float d
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,alpha,1,0);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
-	#elif GBREND == GBREND_RAY
-		Color _c;
-		_c.r=255;
-		_c.g=255;
-		_c.b=255;
-		_c.a=alpha;
-		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
 	#elif GBREND == GBREND_QUICK
 		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(alpha,alpha,alpha,alpha),partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
@@ -421,13 +345,6 @@ void drawTexturePartSizedTintAlpha(crossTexture* passedTexture, float destX, flo
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,r,g,b,a,1,1);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale, RGBA8(r,g,b,a));
-	#elif GBREND == GBREND_RAY
-		Color _c;
-		_c.r=r;
-		_c.g=g;
-		_c.b=b;
-		_c.a=a;
-		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
 	#elif GBREND == GBREND_QUICK
 		//printf("libgoodbrew: lol theres no way this works\n");
 		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(a,a,a,a),partX,partY,partW,partH,destX,destY,destW,destH,0);

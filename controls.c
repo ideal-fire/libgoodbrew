@@ -25,9 +25,6 @@ extern void XOutFunction();
 	#include <SDL2/SDL_keycode.h>
 	#include <goodbrew/graphics.h> // For screen width and height
 	SDL_Keycode lastSDLPressedKey=SDLK_UNKNOWN;
-#elif GBREND == GBREND_RAY
-	#include <goodbrew/graphics.h> // For screen width and height
-	#include <rayn.h>
 #elif GBREND == GBREND_QUICK
 	#include <allegro5/allegro.h>
 	static ALLEGRO_KEYBOARD_STATE curControls;
@@ -40,27 +37,6 @@ extern void XOutFunction();
 #define TOBOOL(x) ((x)>0)
 
 //////////////////////////////////////////////////////////
-#if GBREND == GBREND_RAY
-	int buttonToRayMap[NUMBUTTONS]={
-		0,
-		KEY_X, //a
-		KEY_Z,
-		KEY_S, //x
-		KEY_A,
-		KEY_L,
-		KEY_R,
-		KEY_UP,
-		KEY_DOWN,
-		KEY_LEFT,
-		KEY_RIGHT,
-		KEY_ENTER, // start
-		KEY_E,
-		0, // touch
-		0, // scroll
-		0, // back
-		0, //resize		
-	};
-#endif
 #if GBREND == GBREND_QUICK
 	int buttonToQuickMap[NUMBUTTONS]={
 		0,
@@ -88,31 +64,11 @@ int fixButtonAlias(crossButton _passedButton){
 	}
 	return _passedButton;
 }
-#if GBREND == GBREND_RAY
-	#ifdef NATHANRAYLIBFORK
-		void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
-			crossButton _aliased = fixButtonAlias(_passedButton);
-			if (buttonToRayMap[_aliased]){
-				_aliased=buttonToRayMap[_aliased];
-				rayCurrentKeyState[_aliased]=_newCurStatus;
-				rayPrevKeyState[_aliased]=_newLastStatus;
-			}else{
-				currentPad[_aliased]=_newCurStatus;
-				lastPad[_aliased]=_newLastStatus;
-			}
-		}
-	#else
-		void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
-			puts("doesnt work");
-		}
-	#endif
-#else
-	void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
-		crossButton _realButton = fixButtonAlias(_passedButton);
-		currentPad[_realButton]=_newCurStatus;
-		lastPad[_realButton]=_newLastStatus;
-	}	
-#endif
+void lowSetButtonState(crossButton _passedButton, char _newCurStatus, char _newLastStatus){
+	crossButton _realButton = fixButtonAlias(_passedButton);
+	currentPad[_realButton]=_newCurStatus;
+	lastPad[_realButton]=_newLastStatus;
+}
 void setJustPressed(crossButton _passedButton){
 	lowSetButtonState(_passedButton,1,0);
 }
@@ -267,25 +223,6 @@ void controlsStart(){
 		currentPad[BUTTON_SELECT] 	= TOBOOL(_pad & KEY_MINUS);
 	#elif GBREND == GBREND_SDL
 		_readSDLControls();
-	#elif GBREND == GBREND_RAY
-		if ((currentPad[BUTTON_RESIZE] = IsWindowResized())){
-			_goodbrewRealScreenWidth=GetScreenWidth();
-			_goodbrewRealScreenHeight=GetScreenHeight();
-		}
-		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) || (GBPLAT==GB_ANDROID && GetTouchPointsCount()!=0)){
-			currentPad[BUTTON_TOUCH]=1;
-			lastClickWasRight=0;
-		}else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)){
-			currentPad[BUTTON_TOUCH]=1;
-			lastClickWasRight=1;
-		}else{
-			currentPad[BUTTON_TOUCH]=0;
-		}
-		touchX=GetTouchX();
-		touchY=GetTouchY();
-		if (WindowShouldClose()){
-			XOutFunction();
-		}
 	#elif GBREND == GBREND_QUICK
 		al_get_keyboard_state(&curControls);
 		al_get_mouse_state(&curMouseState);
@@ -324,11 +261,6 @@ char controlsInit(){
 //
 char wasJustReleased(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
-	#if GBREND == GBREND_RAY
-		if (buttonToRayMap[_aliased]){
-			return IsKeyReleased(buttonToRayMap[_aliased]);
-		}
-	#endif
 	#if GBREND == GBREND_QUICK
 		if (buttonToQuickMap[_aliased]){
 			return !al_key_down(&curControls,buttonToQuickMap[_aliased]-1) && al_key_down(&prevControls,buttonToQuickMap[_aliased]-1);
@@ -338,11 +270,6 @@ char wasJustReleased(crossButton _passedButton){
 }
 char wasJustPressed(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
-	#if GBREND == GBREND_RAY
-		if (buttonToRayMap[_aliased]){
-			return IsKeyPressed(buttonToRayMap[_aliased]);
-		}
-	#endif
 	#if GBREND == GBREND_QUICK
 		if (buttonToQuickMap[_aliased]){
 			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1) && !al_key_down(&prevControls,buttonToQuickMap[_aliased]-1);
@@ -352,11 +279,6 @@ char wasJustPressed(crossButton _passedButton){
 }
 char isDown(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
-	#if GBREND == GBREND_RAY
-		if (buttonToRayMap[_aliased]){
-			return IsKeyDown(buttonToRayMap[_aliased]);
-		}
-	#endif
 	#if GBREND == GBREND_QUICK
 		if (buttonToQuickMap[_aliased]){
 			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1);
@@ -366,12 +288,6 @@ char isDown(crossButton _passedButton){
 }
 char wasIsDown(crossButton _passedButton){
 	crossButton _aliased = fixButtonAlias(_passedButton);
-	#if GBREND == GBREND_RAY
-		if (buttonToRayMap[_aliased]){
-			_aliased=buttonToRayMap[_aliased];
-			return IsKeyDown(_aliased) || IsKeyPressed(_aliased);
-		}
-	#endif
 	#if GBREND == GBREND_QUICK
 		if (buttonToQuickMap[_aliased]){
 			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1) ||(&prevControls,buttonToQuickMap[_aliased]-1);

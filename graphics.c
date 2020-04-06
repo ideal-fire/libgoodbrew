@@ -16,9 +16,6 @@
 	#include <sf2d.h>
 	#include <sfil.h>
 	#include <3ds/svc.h>
-#elif GBREND == GBREND_RAY
-	#include <rayn.h>
-	static Color _raylibClearColor;
 #elif GBREND == GBREND_QUICK
 	#include <allegro5/allegro.h>
 	#include <allegro5/allegro_primitives.h>
@@ -60,8 +57,6 @@ int getScreenHeight(){
 void setWindowTitle(char* _newTitle){
 	#if GBREND == GBREND_SDL
 		SDL_SetWindowTitle(mainWindow,_newTitle);
-	#elif GBREND == GBREND_RAY
-		SetWindowTitle(_newTitle);
 	#elif GBREND == GBREND_QUICK
 		al_set_window_title(aDisplay,_newTitle);
 	#endif
@@ -136,18 +131,6 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 		sf2d_init();
 		_windowWidth=400;
 		_windowHeight=240;
-	#elif GBREND == GBREND_RAY
-		SetConfigFlags(FLAG_MSAA_4X_HINT);
-		int _windowFlags=0;
-		if (GBPLAT==GB_ANDROID || _passedFlags & WINDOWFLAG_FULLSCREEN){
-			_windowFlags|=FLAG_FULLSCREEN_MODE;
-		}
-		if (_passedFlags & WINDOWFLAG_RESIZABLE){
-			_windowFlags|=FLAG_WINDOW_RESIZABLE;
-		}
-		_windowFlags|=FLAG_VSYNC_HINT;
-		SetConfigFlags(_windowFlags);
-		InitWindow(_windowWidth,_windowHeight,"TestWindow");
 	#elif GBREND == GBREND_QUICK
 		if (!al_init()) {
 			fprintf(stderr,"Could not init Allegro.\n");
@@ -180,9 +163,6 @@ void startDrawing(){
 		#endif
 	#elif GBREND == GBREND_SF2D
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-	#elif GBREND == GBREND_RAY
-		BeginDrawing();
-		ClearBackground(_raylibClearColor);
 	#elif GBREND == GBREND_QUICK
 		al_clear_to_color(_allegroClearColor);
 	#endif
@@ -204,8 +184,6 @@ void endDrawing(){
 	#elif GBREND == GBREND_SF2D
 		sf2d_end_frame();
 		sf2d_swapbuffers();
-	#elif GBREND == GBREND_RAY
-		EndDrawing();
 	#elif GBREND == GBREND_QUICK
 		al_flip_display();
 	#endif
@@ -222,8 +200,6 @@ void quitGraphics(){
 		// TODO - vita2d quit
 	#elif GBREND == GBREND_SDL
 		// TODO - SDL quit
-	#elif GBREND == GBREND_RAY
-		CloseWindow();
 	#elif GBREND == GBREND_QUICK
 		// TODO - allegro quit
 	#endif
@@ -235,11 +211,6 @@ void setClearColor(int r, int g, int b){
 		vita2d_set_clear_color(RGBA8(r, g, b, 255));
 	#elif GBREND == GBREND_SF2D
 		sf2d_set_clear_color(RGBA8(r, g, b, 255));
-	#elif GBREND == GBREND_RAY
-		_raylibClearColor.r=r;
-		_raylibClearColor.g=g;
-		_raylibClearColor.b=b;
-		_raylibClearColor.a=255;
 	#elif GBREND == GBREND_QUICK
 		_allegroClearColor=al_map_rgb_f(r,g,b);
 	#endif
@@ -272,13 +243,6 @@ void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 		SDL_SetRenderDrawColor(mainWindowRenderer,oldr,oldg,oldb,olda);
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_rectangle(x,y,w,h,RGBA8(r,g,b,a));
-	#elif GBREND == GBREND_RAY
-		Color c;
-		c.r=r;
-		c.g=g;
-		c.b=b;
-		c.a=a;
-		DrawRectangle(x,y,w,h,c);
 	#elif GBREND == GBREND_QUICK
 		al_draw_filled_rectangle(x,y,x+w,y+h,al_map_rgba(r,g,b,a));
 	#endif

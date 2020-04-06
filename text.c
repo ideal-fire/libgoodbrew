@@ -11,9 +11,6 @@
 	#include <SDL_FontCache.h>
 #elif GBTXT == GBTXT_VITA2D
 	#include <vita2d.h>
-#elif GBTXT == GBTXT_RAY
-	#include <rayn.h>
-	#define RAYTXTCHARSPACING 1
 #endif
 
 #if GBTXT == GBTXT_FONTCACHE
@@ -53,7 +50,7 @@ double getResonableFontSize(char _passedType){
 	if (_passedType==GBTXT_BITMAP){
 		return BITMAP_FONT_FAKE_SIZE;
 	}
-	#if GBTXT == GBTXT_FONTCACHE || GBTXT == GBTXT_RAY
+	#if GBTXT == GBTXT_FONTCACHE
 		return 20;
 	#elif GBTXT == GBTXT_VITA2D
 		return 32;
@@ -72,9 +69,6 @@ void freeFont(crossFont* _passedFont){
 			FC_FreeFont(_passedFont->data);
 		#elif GBTXT == GBTXT_VITA2D
 			vita2d_free_font(_passedFont->data);
-		#elif GBTXT == GBTXT_RAY
-			UnloadFont(*((Font*)_passedFont->data));
-			free(_passedFont->data);
 		#endif
 	}
 	free(_passedFont);
@@ -178,9 +172,6 @@ crossFont* loadFont(const char* filename, double _passedSize){
 			FC_LoadFont(_retFont->data, mainWindowRenderer, filename, _passedSize, FC_MakeColor(0,0,0,255), TTF_STYLE_NORMAL);
 		#elif GBTXT == GBTXT_VITA2D
 			_retFont->data = vita2d_load_font_file(filename);
-		#elif GBTXT == GBTXT_RAY
-			_retFont->data = malloc(sizeof(Font));
-			*((Font*)_retFont->data) = LoadFont(filename);
 		#endif
 		_retFont->size = _passedSize;
 	}
@@ -200,8 +191,6 @@ int textHeight(crossFont* _passedFont){
 		return vita2d_font_text_height(_passedFont->data,_passedFont->size,"a");
 	#elif GBTXT == GBTXT_FONTCACHE
 		return floor(FC_GetLineHeight(_passedFont->data));
-	#elif GBTXT == GBTXT_RAY
-		return _passedFont->size;
 	#elif GBTXT == TEXT_UNDEFINED
 		return 32;
 	#endif
@@ -224,8 +213,6 @@ int textWidth(crossFont* _passedFont, const char* message){
 		return vita2d_font_text_width(_passedFont->data,_passedFont->size,message);
 	#elif GBTXT == GBTXT_FONTCACHE
 		return FC_GetWidth(_passedFont->data,"%s",message);
-	#elif GBTXT == GBTXT_RAY
-		return MeasureTextEx(*((Font*)_passedFont->data),message,_passedFont->size,RAYTXTCHARSPACING).x;
 	#elif GBTXT == TEXT_UNDEFINED
 		return _passedFont->size*strlen(message);
 	#endif
@@ -253,16 +240,6 @@ void gbDrawTextAlpha(crossFont* _passedFont, float x, float y, const char* text,
 			_tempcolor.b = b;
 			_tempcolor.a = a;
 			FC_DrawColor(_passedFont->data, mainWindowRenderer, x, y, _tempcolor ,"%s", text);
-		#elif GBTXT == GBTXT_RAY
-			Color _c;
-			_c.r=r;
-			_c.g=g;
-			_c.b=b;
-			_c.a=a;
-			Vector2 _p;
-			_p.x=x;
-			_p.y=y;
-			DrawTextEx(*((Font*)_passedFont->data),text,_p,_passedFont->size,RAYTXTCHARSPACING,_c);
 		#endif
 	}
 }
