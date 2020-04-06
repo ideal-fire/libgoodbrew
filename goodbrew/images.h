@@ -17,6 +17,10 @@ extern "C" {
 #elif GBREND == GBREND_RAY
 	#include <rayn.h>
 	typedef Texture2D crossTexture;
+#elif GBREND==GBREND_QUICK
+	#include <allegro5/allegro.h>
+	#include <allegro5/allegro_image.h>
+	typedef ALLEGRO_BITMAP crossTexture;
 #endif
 
 void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, unsigned char alpha);

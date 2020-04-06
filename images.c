@@ -117,6 +117,8 @@ void initImages(){
 	#if GBREND == GBREND_SDL
 		IMG_Init( IMG_INIT_PNG );
 		IMG_Init( IMG_INIT_JPG );
+	#elif GBREND == GBREND_QUICK
+		al_init_image_addon();
 	#endif
 }
 void enableSmoothScaling(crossTexture* _passedTexture){
@@ -210,6 +212,8 @@ crossTexture* loadPNG(const char* path){
 		Texture2D* _ret = malloc(sizeof(Texture2D));
 		*_ret=LoadTexture(path);
 		return _ret;
+	#elif GBREND == GBREND_QUICK
+		return al_load_bitmap(path);
 	#endif
 }
 crossTexture* loadJPG(const char* path){
@@ -217,7 +221,7 @@ crossTexture* loadJPG(const char* path){
 		return vita2d_load_JPEG_file(path);
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_PNG_file(path,SF2D_PLACE_RAM);
-	#elif GBREND == GBREND_SDL || GBREND == GBREND_RAY
+	#elif GBREND == GBREND_SDL || GBREND == GBREND_RAY || GBREND == GBREND_QUICK
 		return loadPNG(path);
 	#endif
 }
@@ -228,7 +232,7 @@ crossTexture* loadBMP(const char* path){
 		return surfaceToTexture(SDL_LoadBMP(path));
 	#elif GBREND == GBREND_SF2D
 		return sfil_load_BMP_file(path,SF2D_PLACE_RAM);
-	#elif GBREND == GBREND_RAY
+	#elif GBREND == GBREND_RAY || GBREND == GBREND_QUICK
 		return loadPNG(path);
 	#endif
 }
@@ -248,6 +252,8 @@ void freeTexture(crossTexture* passedTexture){
 	#elif GBREND == GBREND_RAY
 		UnloadTexture(*passedTexture);
 		free(passedTexture);
+	#elif GBREND == GBREND_QUICK
+		al_destroy_bitmap(passedTexture);
 	#endif
 }
 int getTextureWidth(crossTexture* passedTexture){
@@ -261,6 +267,8 @@ int getTextureWidth(crossTexture* passedTexture){
 		return passedTexture->width;
 	#elif GBREND == GBREND_RAY
 		return passedTexture->width;
+	#elif GBREND == GBREND_QUICK
+		return al_get_bitmap_width(passedTexture);
 	#endif
 }
 int getTextureHeight(crossTexture* passedTexture){
@@ -274,6 +282,8 @@ int getTextureHeight(crossTexture* passedTexture){
 		return passedTexture->height;
 	#elif GBREND == GBREND_RAY
 		return passedTexture->height;
+	#elif GBREND == GBREND_QUICK
+		return al_get_bitmap_height(passedTexture);
 	#endif
 }
 // Zero modifiers
@@ -287,6 +297,8 @@ void drawTexture(crossTexture* passedTexture, float destX, float destY){
 		//sf2d_draw_texture(passedTexture,_destX,_destY);
 	#elif GBREND == GBREND_RAY
 		DrawTexture(*passedTexture,destX,destY,WHITE);
+	#elif GBREND == GBREND_QUICK
+		al_draw_bitmap(passedTexture,destX,destY,0);
 	#endif
 }
 // One modifier
@@ -300,6 +312,8 @@ void drawTextureSized(crossTexture* passedTexture, float destX, float destY, int
 		//sf2d_draw_texture_scale(passedTexture,destX,destY,partXScale,partYScale);
 	#elif GBREND == GBREND_RAY
 		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,WHITE);
+	#elif GBREND == GBREND_QUICK
+		al_draw_scaled_bitmap(passedTexture,0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),destX,destY,destW,destH,0);
 	#endif
 }
 void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, unsigned char alpha){
@@ -317,6 +331,8 @@ void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, uns
 		_c.b=255;
 		_c.a=alpha;
 		DrawTexture(*passedTexture,destX,destY,_c);
+	#elif GBREND == GBREND_QUICK
+		al_draw_tinted_bitmap(passedTexture,al_map_rgba(1,1,1,alpha),destX,destY,0);
 	#endif
 }
 void drawTextureScaled(crossTexture* passedTexture, float destX, float destY, double _scaleFactor){
@@ -333,6 +349,8 @@ void drawTexturePartSized(crossTexture* passedTexture, float destX, float destY,
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
 	#elif GBREND == GBREND_RAY
 		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,WHITE);
+	#elif GBREND == GBREND_QUICK
+		al_draw_scaled_bitmap(passedTexture,partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
 }
 void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _drawY, int _scaledW, int _scaledH, unsigned char alpha){
@@ -350,8 +368,11 @@ void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _dra
 		_c.b=255;
 		_c.a=alpha;
 		rayDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,_c);
+	#elif GBREND == GBREND_QUICK
+		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(alpha,alpha,alpha,alpha),0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),_drawX,_drawY,_scaledW,_scaledH,0);
 	#endif
 }
+// why is this function here it's the most useless thing of all time
 void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b){
 	EASYFIXCOORDS(&destX,&destY);
 	#if GBREND == GBREND_VITA2D
@@ -367,6 +388,8 @@ void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY,
 		_c.b=b;
 		_c.a=255;
 		rayDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,_c);
+	#elif GBREND == GBREND_QUICK
+		drawTexturePartSizedTintAlpha(passedTexture,destX,destY,destW,destH,0,0,getTextureWidth(passedTexture),getTextureHeight(passedTexture),r,g,b,1);
 	#endif
 }
 // Three modifiers
@@ -385,6 +408,8 @@ void drawTexturePartSizedAlpha(crossTexture* passedTexture, float destX, float d
 		_c.b=255;
 		_c.a=alpha;
 		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
+	#elif GBREND == GBREND_QUICK
+		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(alpha,alpha,alpha,alpha),partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
 }
 // All four modifiers
@@ -403,5 +428,8 @@ void drawTexturePartSizedTintAlpha(crossTexture* passedTexture, float destX, flo
 		_c.b=b;
 		_c.a=a;
 		rayDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,_c);
+	#elif GBREND == GBREND_QUICK
+		//printf("libgoodbrew: lol theres no way this works\n");
+		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(a,a,a,a),partX,partY,partW,partH,destX,destY,destW,destH,0);
 	#endif
 }

@@ -28,6 +28,12 @@ extern void XOutFunction();
 #elif GBREND == GBREND_RAY
 	#include <goodbrew/graphics.h> // For screen width and height
 	#include <rayn.h>
+#elif GBREND == GBREND_QUICK
+	#include <allegro5/allegro.h>
+	static ALLEGRO_KEYBOARD_STATE curControls;
+	static ALLEGRO_KEYBOARD_STATE prevControls;
+	static ALLEGRO_MOUSE_STATE curMouseState;
+	static int prevMouseBallZ;
 #endif
 
 // so we can assign to a char
@@ -52,6 +58,27 @@ extern void XOutFunction();
 		0, // touch
 		0, // scroll
 		0, // back
+		0, //resize		
+	};
+#endif
+#if GBREND == GBREND_QUICK
+	int buttonToQuickMap[NUMBUTTONS]={
+		0,
+		ALLEGRO_KEY_X+1, //a
+		ALLEGRO_KEY_Z+1,
+		ALLEGRO_KEY_S+1, //x
+		ALLEGRO_KEY_A+1,
+		ALLEGRO_KEY_L+1,
+		ALLEGRO_KEY_R+1,
+		ALLEGRO_KEY_UP+1,
+		ALLEGRO_KEY_DOWN+1,
+		ALLEGRO_KEY_LEFT+1,
+		ALLEGRO_KEY_RIGHT+1,
+		ALLEGRO_KEY_ENTER+1, // start
+		ALLEGRO_KEY_E+1,
+		0, // touch
+		0, // scroll
+		ALLEGRO_KEY_B+1, // back
 		0, //resize		
 	};
 #endif
@@ -259,16 +286,38 @@ void controlsStart(){
 		if (WindowShouldClose()){
 			XOutFunction();
 		}
+	#elif GBREND == GBREND_QUICK
+		al_get_keyboard_state(&curControls);
+		al_get_mouse_state(&curMouseState);
+		// mouse
+		touchX=curMouseState.x;
+		touchY=curMouseState.y;
+		if (al_mouse_button_down(&curMouseState,1) || al_mouse_button_down(&curMouseState,2)){
+			currentPad[BUTTON_TOUCH]=1;
+			lastClickWasRight=al_mouse_button_down(&curMouseState,2);
+		}else{
+			currentPad[BUTTON_TOUCH]=0;
+		}
+		mouseScroll=curMouseState.z-prevMouseBallZ;
+		prevMouseBallZ=curMouseState.z;
 	#else
 		#warning no control code for this setup
 	#endif
 }
 void controlsEnd(){
 	memcpy(lastPad,currentPad,sizeof(currentPad));
+	#if GBREND == GBREND_QUICK
+		prevControls=curControls;
+	#endif
 }
 char controlsInit(){
 	#if GBPLAT == GB_VITA
 		sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT,1);
+	#endif
+	#if GBREND == GBREND_QUICK
+		al_get_keyboard_state(&curControls);
+		al_get_mouse_state(&curMouseState);
+		prevMouseBallZ=curMouseState.z;
 	#endif
 	return 0;
 }
@@ -280,6 +329,11 @@ char wasJustReleased(crossButton _passedButton){
 			return IsKeyReleased(buttonToRayMap[_aliased]);
 		}
 	#endif
+	#if GBREND == GBREND_QUICK
+		if (buttonToQuickMap[_aliased]){
+			return !al_key_down(&curControls,buttonToQuickMap[_aliased]-1) && al_key_down(&prevControls,buttonToQuickMap[_aliased]-1);
+		}
+	#endif
 	return lastPad[_aliased] && !currentPad[_aliased];
 }
 char wasJustPressed(crossButton _passedButton){
@@ -287,6 +341,11 @@ char wasJustPressed(crossButton _passedButton){
 	#if GBREND == GBREND_RAY
 		if (buttonToRayMap[_aliased]){
 			return IsKeyPressed(buttonToRayMap[_aliased]);
+		}
+	#endif
+	#if GBREND == GBREND_QUICK
+		if (buttonToQuickMap[_aliased]){
+			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1) && !al_key_down(&prevControls,buttonToQuickMap[_aliased]-1);
 		}
 	#endif
 	return !lastPad[_aliased] && currentPad[_aliased];
@@ -298,6 +357,11 @@ char isDown(crossButton _passedButton){
 			return IsKeyDown(buttonToRayMap[_aliased]);
 		}
 	#endif
+	#if GBREND == GBREND_QUICK
+		if (buttonToQuickMap[_aliased]){
+			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1);
+		}
+	#endif
 	return currentPad[_aliased];
 }
 char wasIsDown(crossButton _passedButton){
@@ -306,6 +370,11 @@ char wasIsDown(crossButton _passedButton){
 		if (buttonToRayMap[_aliased]){
 			_aliased=buttonToRayMap[_aliased];
 			return IsKeyDown(_aliased) || IsKeyPressed(_aliased);
+		}
+	#endif
+	#if GBREND == GBREND_QUICK
+		if (buttonToQuickMap[_aliased]){
+			return al_key_down(&curControls,buttonToQuickMap[_aliased]-1) ||(&prevControls,buttonToQuickMap[_aliased]-1);
 		}
 	#endif
 	return currentPad[_aliased] || lastPad[_aliased];

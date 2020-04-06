@@ -27,6 +27,9 @@
 #if GBREND == GBREND_RAY
 	#include <rayn.h>
 	#define RAYLIBHDTIMERES 10000
+#elif GBREND == GBREND_QUICK
+	#include <allegro5/allegro.h>
+	#define RAYLIBHDTIMERES 10000
 #endif
 void generalGoodInit(){
 	#if GBPLAT == GB_3DS
@@ -77,6 +80,8 @@ u64 getMilli(){
 		}
 	#elif GBREND == GBREND_RAY
 		return GetTime()*1000;
+	#elif GBREND == GBREND_QUICK
+		return al_get_time()*1000;
 	#else
 		struct timespec _myTime;
 		clock_gettime(CLOCK_MONOTONIC, &_myTime);
@@ -88,6 +93,8 @@ u64 getHDTimeRes(){
 		return SDL_GetPerformanceFrequency();
 	#elif GBREND == GBREND_RAY
 		return RAYLIBHDTIMERES;
+	#elif GBREND == GBREND_QUICK
+		return RAYLIBHDTIMERES;
 	#else
 		return 1000;
 	#endif
@@ -97,6 +104,8 @@ u64 getHDTime(){
 		return SDL_GetPerformanceCounter();
 	#elif GBREND == GBREND_RAY
 		return GetTime()*RAYLIBHDTIMERES;
+	#elif GBREND == GBREND_QUICK
+		return al_get_time()*RAYLIBHDTIMERES;
 	#else
 		return getMilli();
 	#endif

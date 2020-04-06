@@ -19,6 +19,11 @@
 #elif GBREND == GBREND_RAY
 	#include <rayn.h>
 	static Color _raylibClearColor;
+#elif GBREND == GBREND_QUICK
+	#include <allegro5/allegro.h>
+	#include <allegro5/allegro_primitives.h>
+	static ALLEGRO_DISPLAY* aDisplay;
+	static ALLEGRO_COLOR _allegroClearColor;
 #endif
 
 // Used to fix touch coords on Android.
@@ -57,6 +62,8 @@ void setWindowTitle(char* _newTitle){
 		SDL_SetWindowTitle(mainWindow,_newTitle);
 	#elif GBREND == GBREND_RAY
 		SetWindowTitle(_newTitle);
+	#elif GBREND == GBREND_QUICK
+		al_set_window_title(aDisplay,_newTitle);
 	#endif
 }
 void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
@@ -141,6 +148,18 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 		_windowFlags|=FLAG_VSYNC_HINT;
 		SetConfigFlags(_windowFlags);
 		InitWindow(_windowWidth,_windowHeight,"TestWindow");
+	#elif GBREND == GBREND_QUICK
+		if (!al_init()) {
+			fprintf(stderr,"Could not init Allegro.\n");
+			exit(1);
+		}
+		al_install_mouse();
+		al_install_keyboard();
+		if (!(aDisplay = al_create_display(_windowWidth,_windowHeight))) {
+			fprintf(stderr,"Error creating display\n");
+			exit(1);
+		}
+		_allegroClearColor=al_map_rgb_f(255,255,255);
 	#else
 		#error Forgot to make graphics init function
 	#endif
@@ -164,6 +183,8 @@ void startDrawing(){
 	#elif GBREND == GBREND_RAY
 		BeginDrawing();
 		ClearBackground(_raylibClearColor);
+	#elif GBREND == GBREND_QUICK
+		al_clear_to_color(_allegroClearColor);
 	#endif
 }
 
@@ -185,6 +206,8 @@ void endDrawing(){
 		sf2d_swapbuffers();
 	#elif GBREND == GBREND_RAY
 		EndDrawing();
+	#elif GBREND == GBREND_QUICK
+		al_flip_display();
 	#endif
 }
 #if GBREND == GBREND_SF2D
@@ -201,6 +224,8 @@ void quitGraphics(){
 		// TODO - SDL quit
 	#elif GBREND == GBREND_RAY
 		CloseWindow();
+	#elif GBREND == GBREND_QUICK
+		// TODO - allegro quit
 	#endif
 }
 void setClearColor(int r, int g, int b){
@@ -215,6 +240,8 @@ void setClearColor(int r, int g, int b){
 		_raylibClearColor.g=g;
 		_raylibClearColor.b=b;
 		_raylibClearColor.a=255;
+	#elif GBREND == GBREND_QUICK
+		_allegroClearColor=al_map_rgb_f(r,g,b);
 	#endif
 	_goodbrewClearR=r;
 	_goodbrewClearG=g;
@@ -252,6 +279,8 @@ void _drawRectangle(int x, int y, int w, int h, int r, int g, int b, int a){
 		c.b=b;
 		c.a=a;
 		DrawRectangle(x,y,w,h,c);
+	#elif GBREND == GBREND_QUICK
+		al_draw_filled_rectangle(x,y,x+w,y+h,al_map_rgba(r,g,b,a));
 	#endif
 }
 void drawRectangle(float x, float y, int w, int h, int r, int g, int b, int a){
@@ -278,6 +307,8 @@ void enableClipping(int x, int y, int w, int h){
 		SDL_RenderSetClipRect(mainWindowRenderer,&_passedRegion);
 	#elif GBREND == GBREND_SF2D
 		// Not supported
+	#elif GBREND == GBREND_QUICK
+		al_set_clipping_rectangle(x,y,w,h);
 	#endif
 }
 void disableClipping(){
@@ -287,5 +318,7 @@ void disableClipping(){
 		SDL_RenderSetClipRect(mainWindowRenderer,NULL);
 	#elif GBREND == GBREND_SF2D
 		// Not supported
+	#elif GBREND == GBREND_QUICK
+		al_set_clipping_rectangle(0,0,getScreenWidth(),getScreenHeight());
 	#endif
 }

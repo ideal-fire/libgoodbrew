@@ -18,6 +18,7 @@
 #define GBREND_SDL 2
 #define GBREND_SF2D 3
 #define GBREND_RAY 4
+#define GBREND_QUICK 5 // allegro5
 
 #define GBTXT_NONE 0
 #define GBTXT_BITMAP 1

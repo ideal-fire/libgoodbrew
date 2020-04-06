@@ -8,6 +8,8 @@ extern "C" {
 	#include <SDL2/SDL.h>
 	extern SDL_Window* mainWindow;
 	extern SDL_Renderer* mainWindowRenderer;
+#elif GBREND==GBREND_QUICK
+	#include <allegro5/allegro.h>
 #endif
 #if DOFIXCOORDS == 1
 	float fixX(float x);
