@@ -31,6 +31,8 @@ extern void XOutFunction();
 	static ALLEGRO_KEYBOARD_STATE prevControls;
 	static ALLEGRO_MOUSE_STATE curMouseState;
 	static int prevMouseBallZ;
+	static ALLEGRO_EVENT_QUEUE* eventQueue;
+	extern ALLEGRO_DISPLAY* aDisplay;
 #endif
 
 // so we can assign to a char
@@ -224,6 +226,14 @@ void controlsStart(){
 	#elif GBREND == GBREND_SDL
 		_readSDLControls();
 	#elif GBREND == GBREND_QUICK
+
+		ALLEGRO_EVENT _curevent;
+		while (al_get_next_event(eventQueue, &_curevent)){
+			if (_curevent.type==ALLEGRO_EVENT_DISPLAY_CLOSE){
+				XOutFunction();
+			}
+		}
+		
 		al_get_keyboard_state(&curControls);
 		al_get_mouse_state(&curMouseState);
 		// mouse
@@ -255,6 +265,12 @@ char controlsInit(){
 		al_get_keyboard_state(&curControls);
 		al_get_mouse_state(&curMouseState);
 		prevMouseBallZ=curMouseState.z;
+		if (aDisplay==NULL){
+			fprintf(stderr,"init the display first\n");
+			exit(1);
+		}
+		eventQueue = al_create_event_queue();
+		al_register_event_source(eventQueue,al_get_display_event_source(aDisplay));
 	#endif
 	return 0;
 }

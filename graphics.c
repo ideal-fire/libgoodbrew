@@ -19,7 +19,7 @@
 #elif GBREND == GBREND_QUICK
 	#include <allegro5/allegro.h>
 	#include <allegro5/allegro_primitives.h>
-	static ALLEGRO_DISPLAY* aDisplay;
+	ALLEGRO_DISPLAY* aDisplay;
 	static ALLEGRO_COLOR _allegroClearColor;
 #endif
 
