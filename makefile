@@ -1,4 +1,4 @@
-src = base.c graphics.c images.c paths.c useful.c text.c controls.c sound.c netCode.c
+src = base.c graphics.c images.c paths.c useful.c text.c controls.c sound.c
 obj = $(src:.c=.o)
 
 LDFLAGS = 

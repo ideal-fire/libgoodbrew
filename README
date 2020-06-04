@@ -6,6 +6,7 @@ How to compile for PS Vita
 
 How to compile for PC
 ------
+make clean
 make
 
 How to use bitmap fonts
