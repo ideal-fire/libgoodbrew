@@ -99,6 +99,10 @@ void setSFXVolume(crossPlayHandle tochange, int toval){
 	#endif
 }
 void fadeoutMusic(crossPlayHandle _passedHandle,int time){
+	if (time<=0){
+		stopMusic(_passedHandle);
+		return;
+	}
 	#if GBSND == GBSND_SDL
 		Mix_FadeOutMusic(time);
 	#elif GBSND == GBSND_SOLOUD
