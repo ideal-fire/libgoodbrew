@@ -48,6 +48,8 @@
 // if 1, wait 1 millisecond at the end of the frame if it took less than a millisecond.
 #define CAPHUGEFPS 1
 
+#define DISABLEHDTIME 0
+
 #if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
 	#define GBREND GBREND_SDL
 	#define GBTXT GBTXT_FONTCACHE

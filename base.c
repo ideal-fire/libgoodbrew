@@ -89,26 +89,28 @@ u64 getMilli(){
 	#endif
 }
 u64 getHDTimeRes(){
-	#if GBREND == GBREND_SDL
-		return SDL_GetPerformanceFrequency();
-	#elif GBREND == GBREND_RAY
-		return RAYLIBHDTIMERES;
-	#elif GBREND == GBREND_QUICK
-		return RAYLIBHDTIMERES;
-	#else
-		return 1000;
+	#if DISABLEHDTIME == 0
+		#if GBREND == GBREND_SDL
+			return SDL_GetPerformanceFrequency();
+		#elif GBREND == GBREND_RAY
+			return RAYLIBHDTIMERES;
+		#elif GBREND == GBREND_QUICK
+			return RAYLIBHDTIMERES;
+		#endif
 	#endif
+	return 1000;
 }
 u64 getHDTime(){
-	#if GBREND == GBREND_SDL
-		return SDL_GetPerformanceCounter();
-	#elif GBREND == GBREND_RAY
-		return GetTime()*RAYLIBHDTIMERES;
-	#elif GBREND == GBREND_QUICK
-		return al_get_time()*RAYLIBHDTIMERES;
-	#else
-		return getMilli();
+	#if DISABLEHDTIME == 0
+		#if GBREND == GBREND_SDL
+			return SDL_GetPerformanceCounter();
+		#elif GBREND == GBREND_RAY
+			return GetTime()*RAYLIBHDTIMERES;
+		#elif GBREND == GBREND_QUICK
+			return al_get_time()*RAYLIBHDTIMERES;
+		#endif
 	#endif
+	return getMilli();
 }
 signed char checkFileExist(const char* location){
 	#if GBPLAT == GB_ANDROID && GBREND == GBREND_SDL

@@ -22,6 +22,9 @@
 	ALLEGRO_DISPLAY* aDisplay;
 	static ALLEGRO_COLOR _allegroClearColor;
 #endif
+#if __EMSCRIPTEN__
+	#include <emscripten.h>
+#endif
 
 // Used to fix touch coords on Android.
 // Init with dummy values in case used in division
@@ -159,7 +162,7 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 	_goodbrewRealScreenWidth = _windowWidth;
 	_goodbrewRealScreenHeight = _windowHeight;
 }
-#if CAPHUGEFPS == 1
+#if CAPHUGEFPS == 1 || __EMSCRIPTEN__
 	static u64 _goodbrewFrameStartTime;
 #endif
 void startDrawing(){
@@ -168,7 +171,7 @@ void startDrawing(){
 		vita2d_clear_screen();
 	#elif GBREND == GBREND_SDL
 		SDL_RenderClear(mainWindowRenderer);
-		#if CAPHUGEFPS == 1
+		#if CAPHUGEFPS == 1 || __EMSCRIPTEN__
 			_goodbrewFrameStartTime = getMilli();
 		#endif
 	#elif GBREND == GBREND_SF2D
@@ -186,7 +189,12 @@ void endDrawing(){
 	#elif GBREND == GBREND_SDL
 		SDL_RenderPresent(mainWindowRenderer);
 		// this is the only one that may not limit to 60 fps
-		#if CAPHUGEFPS == 1
+		#if __EMSCRIPTEN__
+			int _rest = 16-(getMilli()-_goodbrewFrameStartTime);
+			if (_rest>=0){
+				emscripten_sleep(_rest);
+			}
+		#elif CAPHUGEFPS == 1
 			if (getMilli()-_goodbrewFrameStartTime==0){
 				wait(1);
 			}
