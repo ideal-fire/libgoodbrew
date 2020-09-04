@@ -378,6 +378,13 @@ int crossfseek(crossFile* stream, long int offset, int origin){
 		_seekReturnValue = fseek(stream->fp,offset,_trueOrigin);
 		// If seek failed but it shouldn't have because we're not at the end of the file yet.
 		if (_seekReturnValue!=0 && feof(stream->fp)==0){
+			if (_trueOrigin==SEEK_SET && offset<0){
+				return 1;
+			}else if (_trueOrigin==SEEK_CUR && offset<0 && stream->internalPosition+offset<=0){
+				fseek(stream->fp,0,SEEK_SET);
+				stream->internalPosition=0;
+				return 1;
+			}
 			_fixVitaFile(stream);
 			return crossfseek(stream,offset,_trueOrigin);
 		}else{
