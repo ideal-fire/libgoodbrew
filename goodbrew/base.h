@@ -15,7 +15,8 @@ extern "C" {
 	#include <3ds.h>
 	#include <3ds/svc.h>
 #endif
-#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID || GBPLAT == GB_SWITCH
+	#define ISDIRENTMODE 1
 	#include <dirent.h>
 #endif
 //////////////////////////////
@@ -56,7 +57,7 @@ enum corssFileSeekPoint{
 //////////////////////////////
 // crossDir
 // Directory paths should end in a slash
-#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+#ifdef ISDIRENTMODE
 	typedef DIR* crossDir;
 	typedef struct dirent* crossDirStorage;
 #elif GBPLAT == GB_VITA

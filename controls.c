@@ -20,7 +20,8 @@ extern void XOutFunction();
 	#include <3ds/types.h>
 #elif GBPLAT == GB_SWITCH
 	#include <switch.h>
-#elif GBREND == GBREND_SDL
+#endif
+#if GBREND == GBREND_SDL
 	#include <SDL2/SDL.h>
 	#include <SDL2/SDL_keycode.h>
 	#include <goodbrew/graphics.h> // For screen width and height

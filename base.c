@@ -23,6 +23,8 @@
 	#include <psp2/io/fcntl.h>
 #elif GBPLAT == GB_3DS
 	FS_Archive _sdArchive=0;
+#elif GBPLAT == GB_SWITCH
+	#include <switch.h>
 #endif
 #if GBREND == GBREND_RAY
 	#include <rayn.h>
@@ -168,7 +170,7 @@ void createDirectory(const char* path){
 	}
 #endif
 char dirOpenWorked(crossDir passedir){
-	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+	#ifdef ISDIRENTMODE
 		return !(passedir==NULL);
 	#elif GBPLAT == GB_VITA
 		return (passedir>=0);
@@ -179,7 +181,7 @@ char dirOpenWorked(crossDir passedir){
 	#endif
 }
 crossDir openDirectory(const char* filepath){
-	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+	#ifdef ISDIRENTMODE
 		return opendir(filepath);
 	#elif GBPLAT == GB_VITA
 		return (sceIoDopen(filepath));
@@ -201,7 +203,7 @@ crossDir openDirectory(const char* filepath){
 	#endif
 }
 char* getDirectoryResultName(crossDirStorage* passedStorage){
-	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+	#ifdef ISDIRENTMODE
 		return ((*passedStorage)->d_name);
 	#elif GBPLAT == GB_VITA
 		//WriteToDebugFile
@@ -214,7 +216,7 @@ char* getDirectoryResultName(crossDirStorage* passedStorage){
 }
 // Return 0 if not work
 int directoryRead(crossDir* passedir, crossDirStorage* passedStorage){
-	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+	#ifdef ISDIRENTMODE
 		*passedStorage = readdir (*passedir);
 		if (*passedStorage != NULL){
 			if (strcmp((*passedStorage)->d_name,".")==0 || strcmp((*passedStorage)->d_name,"..")==0){
@@ -244,7 +246,7 @@ int directoryRead(crossDir* passedir, crossDirStorage* passedStorage){
 	#endif
 }
 void directoryClose(crossDir passedir){
-	#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX || GBPLAT == GB_ANDROID
+	#ifdef ISDIRENTMODE
 		closedir(passedir);
 	#elif GBPLAT == GB_VITA
 		sceIoDclose(passedir);

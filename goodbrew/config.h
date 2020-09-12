@@ -64,7 +64,7 @@
 	#define GBSND GBSND_3DS
 #elif GBPLAT == GB_SWITCH
 	#define GBREND GBREND_SDL
-	#define GBTXT GBTXT_FONTCACHE
+	#define GBTXT GBTXT_FONTCACHE // if you change this, change the makefile to remove the SDL/SDL_FontCache.c src entry.
 	#define GBSND GBSND_NONE
 #endif
 

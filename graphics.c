@@ -81,9 +81,9 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 		}
 		#if GBPLAT == GB_SWITCH
 			// For some reason, the other code doesn't work. I have to do it this way.
-			windowWidth=1280;
-			windowHeight=720;
-			SDL_CreateWindowAndRenderer(windowWidth, windowHeight, 0, &mainWindow, &mainWindowRenderer);
+			_windowWidth=1280;
+			_windowHeight=720;
+			SDL_CreateWindowAndRenderer(_windowWidth, _windowHeight, 0, &mainWindow, &mainWindowRenderer);
 		#else
 			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN);			
 		#endif
