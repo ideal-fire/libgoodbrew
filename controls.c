@@ -16,6 +16,10 @@ extern void XOutFunction();
 #if GBPLAT == GB_VITA
 	#include <psp2/ctrl.h>
 	#include <psp2/touch.h>
+	#include <psp2/apputil.h>
+	#include <psp2/system_param.h>
+	static unsigned int vitaselectbutton=SCE_CTRL_CROSS;
+	static unsigned int vitabackbutton=SCE_CTRL_CIRCLE;
 #elif GBPLAT == GB_3DS
 	#include <3ds/types.h>
 #elif GBPLAT == GB_SWITCH
@@ -181,8 +185,8 @@ void controlsStart(){
 		}
 		SceCtrlData _pad;
 		sceCtrlPeekBufferPositive(0, &_pad, 1);
-		currentPad[BUTTON_A] = 		TOBOOL(_pad.buttons & SCE_CTRL_CROSS);
-		currentPad[BUTTON_B] = 		TOBOOL(_pad.buttons & SCE_CTRL_CIRCLE);
+		currentPad[BUTTON_A] = 		TOBOOL(_pad.buttons & vitaselectbutton);
+		currentPad[BUTTON_B] = 		TOBOOL(_pad.buttons & vitabackbutton);
 		currentPad[BUTTON_X] = 		TOBOOL(_pad.buttons & SCE_CTRL_TRIANGLE);
 		currentPad[BUTTON_Y] = 		TOBOOL(_pad.buttons & SCE_CTRL_SQUARE);
 		currentPad[BUTTON_L] = 		TOBOOL(_pad.buttons & SCE_CTRL_LTRIGGER);
@@ -267,6 +271,16 @@ void controlsEnd(){
 char controlsInit(){
 	#if GBPLAT == GB_VITA
 		sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT,1);
+		//
+		SceAppUtilInitParam appUtilParam;
+		SceAppUtilBootParam appUtilBootParam;
+		memset(&appUtilParam, 0, sizeof(SceAppUtilInitParam));
+		memset(&appUtilBootParam, 0, sizeof(SceAppUtilBootParam));
+		sceAppUtilInit(&appUtilParam, &appUtilBootParam);
+		int val;
+		sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, &val);
+		vitaselectbutton = val ? SCE_CTRL_CROSS : SCE_CTRL_CIRCLE;
+		vitabackbutton = val ? SCE_CTRL_CIRCLE : SCE_CTRL_CROSS;
 	#endif
 	#if GBREND == GBREND_QUICK
 		al_get_keyboard_state(&curControls);
