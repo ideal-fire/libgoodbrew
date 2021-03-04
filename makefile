@@ -1,9 +1,10 @@
 src = base.c graphics.c images.c paths.c useful.c text.c controls.c sound.c
 obj = $(src:.c=.o)
 
-LDFLAGS = 
-CFLAGS = -g -I.
+CFLAGS = -g -I. -I./SDL/ `pkg-config --cflags sdl2 SDL2_image SDL2_mixer SDL2_ttf`
 OUTNAME = libgoodbrew.a
+
+PREFIX = /usr/local
 
 $(OUTNAME): $(obj)
 	ar rcs $(OUTNAME) $(obj)
@@ -13,7 +14,8 @@ clean:
 	rm -f $(obj) $(OUTNAME)
 
 install: $(OUTNAME)
-	mkdir -p /usr/local/include/goodbrew
-	cp ./goodbrew/* /usr/local/include/goodbrew/
-	cp $(OUTNAME) /usr/local/lib/
+	mkdir -p $(DESTDIR)$(PREFIX)/include/goodbrew
+	cp ./goodbrew/* $(DESTDIR)$(PREFIX)/include/goodbrew/
+	mkdir -p $(DESTDIR)$(PREFIX)/lib
+	cp $(OUTNAME) $(DESTDIR)$(PREFIX)/lib/
 	@echo installed
