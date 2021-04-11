@@ -87,7 +87,7 @@ u64 getMilli(){
 	#else
 		struct timespec _myTime;
 		clock_gettime(CLOCK_MONOTONIC, &_myTime);
-		return _myTime.tv_nsec/1000000;
+		return _myTime.tv_sec*1000+_myTime.tv_nsec/1000000;
 	#endif
 }
 u64 getHDTimeRes(){

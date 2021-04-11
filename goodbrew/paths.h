@@ -16,6 +16,7 @@ extern signed char gbDataFolderUsing;
 
 char* fixPathAlloc(const char* filename, fileLocationType type);
 void fixPath(const char* filename,char* _buffer, fileLocationType type);
+void fixPathOverride(const char* newpath, fileLocationType type);
 // to set the internal one used by fixPath, use gbDataFolder.
 // _dataDirPreference:
 // -1 - Use alternate if exists, otherwise primary

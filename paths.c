@@ -175,6 +175,14 @@ char* getFixPathString(fileLocationType type){
 	}
 	return type==TYPE_DATA ? gbDataFolder : gbAppdataFolder;
 }
+// you must keep the reference around.
+void fixPathOverride(const char* newpath, fileLocationType type){
+	if (type==TYPE_DATA){
+		gbDataFolder=(char*)newpath;
+	}else{
+		gbAppdataFolder=(char*)newpath;
+	}
+}
 void fixPath(const char* filename,char* _buffer, fileLocationType type){
 	strcpy(_buffer,getFixPathString(type));
 	strcat(_buffer,filename);
