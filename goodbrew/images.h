@@ -4,6 +4,9 @@
 extern "C" {
 #endif
 
+#define GOODBREW_NOFLIP 0
+#define GOODBREW_HFLIP 1
+#define GOODBREW_VFLIP 2
 
 #if GBREND == GBREND_SDL
 	#include <SDL2/SDL.h>
@@ -29,6 +32,8 @@ void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _dra
 void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b);
 void drawTextureSized(crossTexture* passedTexture, float destX, float destY, int destW, int destH);
 void drawTexture(crossTexture* passedTexture, float destX, float destY);
+void drawTexturePartSizedTintAlphaRotate(crossTexture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a, double angle, char wantflip);
+void drawTextureSizedTintAlphaRotate00(crossTexture* passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b, unsigned char a, double angle, char wantflip);
 
 void freeTexture(crossTexture* passedTexture);
 int getTextureHeight(crossTexture* passedTexture);

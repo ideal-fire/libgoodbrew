@@ -36,7 +36,7 @@
 		SDL_SetTextureBlendMode(_returnTexture, SDL_BLENDMODE_BLEND); // Allow the texture to be drawn translucent
 		return _returnTexture;
 	}
-	void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint){
+void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint, double _angle, SDL_Point* rotatecenter, SDL_RendererFlip f){
 		unsigned char oldr;
 		unsigned char oldg;
 		unsigned char oldb;
@@ -73,8 +73,8 @@
 	
 		_destRect.x=destX;
 		_destRect.y=destY;
-	
-		SDL_RenderCopy(mainWindowRenderer, passedTexture, &_srcRect, &_destRect );
+
+		SDL_RenderCopyEx(mainWindowRenderer, passedTexture, &_srcRect, &_destRect,_angle, rotatecenter, f);
 		////
 		if (_doTint){
 			SDL_SetTextureColorMod(passedTexture, oldr, oldg, oldb);
@@ -251,7 +251,7 @@ void drawTexture(crossTexture* passedTexture, float destX, float destY){
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture(passedTexture,destX,destY);
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0);
+		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture(passedTexture,_destX,_destY);
 	#elif GBREND == GBREND_QUICK
@@ -264,7 +264,7 @@ void drawTextureSized(crossTexture* passedTexture, float destX, float destY, int
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_sized(passedTexture,destX,destY,destW,destH);
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,0,0,0,0,0,0);
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,0,0,0,0,0,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale(passedTexture,destX,destY,partXScale,partYScale);
 	#elif GBREND == GBREND_QUICK
@@ -276,7 +276,7 @@ void drawTextureAlpha(crossTexture* passedTexture, float destX, float destY, uns
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,alpha,1,0);
+		SDLDrawShared(passedTexture,destX,destY,-1,-1,-1,-1,-1,-1,0,0,0,alpha,1,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		sf2d_draw_texture_blend(passedTexture,destX,destY,RGBA8(255,255,255,alpha));
 	#elif GBREND == GBREND_QUICK
@@ -292,7 +292,7 @@ void drawTexturePartSized(crossTexture* passedTexture, float destX, float destY,
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH);
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,0,0,0);
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,0,0,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
 	#elif GBREND == GBREND_QUICK
@@ -304,7 +304,7 @@ void drawTextureSizedAlpha(crossTexture* passedTexture, float _drawX, float _dra
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,_drawX,_drawY,_scaledW,_scaledH,RGBA8(255,255,255,alpha));
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,0,0,0,alpha,1,0);
+		SDLDrawShared(passedTexture,_drawX,_drawY,_scaledW,_scaledH,-1,-1,-1,-1,0,0,0,alpha,1,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(255,255,255,alpha));
 	#elif GBREND == GBREND_QUICK
@@ -317,7 +317,7 @@ void drawTextureSizedTint(crossTexture* passedTexture, float destX, float destY,
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_sized(passedTexture,destX,destY,destW,destH,RGBA8(r,g,b,255));
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,255,1,1);
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,255,1,1,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_scale_blend(passedTexture,destX,destY,partXScale,partYScale,RGBA8(r,g,b,255));
 	#elif GBREND == GBREND_QUICK
@@ -330,7 +330,7 @@ void drawTexturePartSizedAlpha(crossTexture* passedTexture, float destX, float d
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(255,255,255,alpha));
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,alpha,1,0);
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,0,0,0,alpha,1,0,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale);
 	#elif GBREND == GBREND_QUICK
@@ -343,11 +343,67 @@ void drawTexturePartSizedTintAlpha(crossTexture* passedTexture, float destX, flo
 	#if GBREND == GBREND_VITA2D
 		vita2d_draw_texture_tint_part_sized(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,RGBA8(r,g,b,a));
 	#elif GBREND == GBREND_SDL
-		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,r,g,b,a,1,1);
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,r,g,b,a,1,1,0,NULL,SDL_FLIP_NONE);
 	#elif GBREND == GBREND_SF2D
 		//sf2d_draw_texture_part_scale_blend(passedTexture,destX,destY,partX,partY,partW, partH, partXScale, partYScale, RGBA8(r,g,b,a));
 	#elif GBREND == GBREND_QUICK
 		//printf("libgoodbrew: lol theres no way this works\n");
 		al_draw_tinted_scaled_bitmap(passedTexture,al_map_rgba(r,g,b,a),partX,partY,partW,partH,destX,destY,destW,destH,0);
+	#endif
+}
+// ultimate
+void drawTexturePartSizedTintAlphaRotate(crossTexture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned char b, unsigned char a, double angle, char wantflip){
+	EASYFIXCOORDS(&destX,&destY);
+	#if GBREND == GBREND_VITA2D
+		if (wantflip & GOODBREW_HFLIP){
+			destX+=destW;
+			destW*=-1;
+		}
+		if (wantflip & GOODBREW_VFLIP){
+			destY+=destH;
+			destH*=-1;
+		}
+		vita2d_draw_texture_part_tint_sized_rotate(passedTexture,destX,destY,partX,partY,partW, partH, destW, destH,angle,RGBA8(r,g,b,a));
+	#elif GBREND == GBREND_SDL
+		SDL_RendererFlip f=SDL_FLIP_NONE;
+		if (wantflip & GOODBREW_HFLIP){
+			f|=SDL_FLIP_HORIZONTAL;
+		}
+		if (wantflip & GOODBREW_VFLIP){
+			f|=SDL_FLIP_VERTICAL;
+		}
+		double as_degrees=(angle/(3.14159*2))*360;
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,partX,partY,partW,partH,r,g,b,a,1,1,as_degrees,NULL,f);
+	#else
+		fprintf(stderr,"libgoodbrew: drawTexturePartSizedTintAlphaRotate unsupported\n");
+	#endif
+}
+void drawTextureSizedTintAlphaRotate00(crossTexture* passedTexture, float destX, float destY, int destW, int destH, unsigned char r, unsigned char g, unsigned char b, unsigned char a, double angle, char wantflip){
+	EASYFIXCOORDS(&destX,&destY);
+	#if GBREND == GBREND_VITA2D
+		if (wantflip & GOODBREW_HFLIP){
+			destX+=destW;
+			destW*=-1;
+		}
+		if (wantflip & GOODBREW_VFLIP){
+			destY+=destH;
+			destH*=-1;
+		}
+		vita2d_draw_texture_tint_sized_rotate_hotspot(passedTexture,destX,destY,destW,destH,angle,0,0,RGBA8(r,g,b,a));
+	#elif GBREND == GBREND_SDL
+		SDL_RendererFlip f=SDL_FLIP_NONE;
+		if (wantflip & GOODBREW_HFLIP){
+			f|=SDL_FLIP_HORIZONTAL;
+		}
+		if (wantflip & GOODBREW_VFLIP){
+			f|=SDL_FLIP_VERTICAL;
+		}
+		double as_degrees=(angle/(3.14159*2))*360;
+		SDL_Point p;
+		p.x=0;
+		p.y=0;
+		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,a,1,1,as_degrees,&p,f);
+	#else
+		fprintf(stderr,"libgoodbrew: drawTexturePartSizedTintAlphaRotate unsupported\n");
 	#endif
 }
