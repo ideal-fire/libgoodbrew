@@ -18,8 +18,8 @@ extern void XOutFunction();
 	#include <psp2/touch.h>
 	#include <psp2/apputil.h>
 	#include <psp2/system_param.h>
-	static unsigned int vitaselectbutton=SCE_CTRL_CROSS;
-	static unsigned int vitabackbutton=SCE_CTRL_CIRCLE;
+	unsigned int vitaselectbutton=SCE_CTRL_CROSS;
+	unsigned int vitabackbutton=SCE_CTRL_CIRCLE;
 #elif GBPLAT == GB_3DS
 	#include <3ds/types.h>
 #elif GBPLAT == GB_SWITCH

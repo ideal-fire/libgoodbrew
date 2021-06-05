@@ -46,6 +46,11 @@ void setJustReleased(crossButton _passedButton);
 extern int touchX;
 extern int touchY;
 
+#if GBPLAT == GB_VITA
+	#include <psp2/ctrl.h>
+	extern unsigned int vitaselectbutton;
+	extern unsigned int vitabackbutton;
+#endif
 #if GBREND == GBREND_SDL
 	#include <SDL2/SDL_keycode.h>
 	extern SDL_Keycode lastSDLPressedKey;
