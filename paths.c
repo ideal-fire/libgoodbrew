@@ -96,7 +96,7 @@ signed char generateDefaultDataDirectory(char** _dataDirPointer, signed char _da
 	#elif GBPLAT == GB_WINDOWS
 		char _buffer[1000];
 		if (GetModuleFileName(NULL,_buffer,sizeof(_buffer))==0){
-			printf("Failed to get exe location.");
+			fprintf(stderr,"Failed to get exe location.\n");
 			strcpy(_buffer,"./");
 		}else{
 			int i;

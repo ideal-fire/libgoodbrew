@@ -204,7 +204,7 @@ crossTexture* loadBMP(const char* path){
 }
 void freeTexture(crossTexture* passedTexture){
 	if (passedTexture==NULL){
-		printf("Don't free NULL textures.");
+		puts("Don't free NULL textures.");
 		return;
 	}
 	#if GBREND == GBREND_VITA2D
