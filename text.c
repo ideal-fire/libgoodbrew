@@ -39,10 +39,13 @@ struct loadedBitmapFont{
 	short height;
 };
 
-double _bitmapFontScaleGet(struct loadedBitmapFont* _passed, double _passedSize){
+static int validbitmapchar(struct loadedBitmapFont* _passedFont, int c){
+	return (c>=_passedFont->firstLetter && c<_passedFont->firstLetter+_passedFont->numLetters);
+}
+static double _bitmapFontScaleGet(struct loadedBitmapFont* _passed, double _passedSize){
 	return (_passedSize/_passed->exportedSize);
 }
-void drawBitmapLetterColorAlpha(struct loadedBitmapFont* _passedFont, double _passedSize, int letterId, int _x, int _y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
+static void drawBitmapLetterColorAlpha(struct loadedBitmapFont* _passedFont, double _passedSize, int letterId, int _x, int _y, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
 	letterId-=_passedFont->firstLetter;
 	drawTexturePartSizedTintAlpha(_passedFont->internalImage,_x,_y+_passedFont->letterInfos[letterId].yOffset*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageWidth*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].imageHeight*_bitmapFontScaleGet(_passedFont,_passedSize),_passedFont->letterInfos[letterId].x,_passedFont->letterInfos[letterId].y,_passedFont->letterInfos[letterId].imageWidth,_passedFont->letterInfos[letterId].imageHeight,r,g,b,a);
 }
@@ -105,6 +108,7 @@ crossFont* loadFont(const char* filename, double _passedSize){
 				// Special sfl format:
 				// (0x00)whatever_png_filename\n
 				// first_characters_ascii_value width_of_characters height_of_characters
+				// all threee of those are text numbers terminated with space.
 				short _readWidth;
 				short _readHeight;
 				_retBitmapFont->firstLetter=crossReadInt(fp);
@@ -124,7 +128,7 @@ crossFont* loadFont(const char* filename, double _passedSize){
 					int j;
 					for (j=0;j<_imageWidthChars;++j){
 						_retBitmapFont->letterInfos[i*_imageWidthChars+j].x = j*_readWidth;
-						_retBitmapFont->letterInfos[i*_imageWidthChars+j].y = i*_readWidth;
+						_retBitmapFont->letterInfos[i*_imageWidthChars+j].y = i*_readHeight;
 						_retBitmapFont->letterInfos[i*_imageWidthChars+j].yOffset=0;
 						_retBitmapFont->letterInfos[i*_imageWidthChars+j].imageWidth = _readWidth;
 						_retBitmapFont->letterInfos[i*_imageWidthChars+j].imageHeight = _readHeight;
@@ -186,7 +190,7 @@ int textHeight(crossFont* _passedFont){
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		return (_castPassed->height*_bitmapFontScaleGet(_castPassed,_passedFont->size));
-	}	
+	}
 	#if GBTXT == GBTXT_VITA2D
 		return vita2d_font_text_height(_passedFont->data,_passedFont->size,"a");
 	#elif GBTXT == GBTXT_FONTCACHE
@@ -200,11 +204,9 @@ int textWidth(crossFont* _passedFont, const char* message){
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		int _currentWidth=0;
-		int _cachedstrlen = strlen(message);
-		int i;
-		for (i=0;i<_cachedstrlen;i++){
-			if (message[i]>=_castPassed->firstLetter && message[i]<_castPassed->firstLetter+_castPassed->numLetters){
-				_currentWidth+=_castPassed->letterInfos[message[i]-_castPassed->firstLetter].imageDisplayWidth*_bitmapFontScaleGet(_castPassed,_passedFont->size);
+		for (char c=*(message++);c!=0;c=*(message++)){
+			if (validbitmapchar(_castPassed,c)){
+				_currentWidth+=_castPassed->letterInfos[c-_castPassed->firstLetter].imageDisplayWidth*_bitmapFontScaleGet(_castPassed,_passedFont->size);
 			}
 		}
 		return _currentWidth;
@@ -218,19 +220,17 @@ int textWidth(crossFont* _passedFont, const char* message){
 	#endif
 }
 void gbDrawTextAlpha(crossFont* _passedFont, float x, float y, const char* text, unsigned char r, unsigned char g, unsigned char b, unsigned char a){
-	EASYFIXCOORDS(&x,&y);
 	if (_passedFont->type==GBTXT_BITMAP){
 		struct loadedBitmapFont* _castPassed = _passedFont->data;
 		int _currentDrawTextX=x;
-		int _cachedstrlen = strlen(text);
-		int i;
-		for (i = 0; i < _cachedstrlen; i++){
-			if (text[i]>=_castPassed->firstLetter && text[i]<_castPassed->firstLetter+_castPassed->numLetters){
-				drawBitmapLetterColorAlpha(_castPassed,_passedFont->size,text[i],_currentDrawTextX,y,r,g,b,a);
-				_currentDrawTextX+=_castPassed->letterInfos[text[i]-_castPassed->firstLetter].imageDisplayWidth*_bitmapFontScaleGet(_castPassed,_passedFont->size);
+		for (char c=*(text++);c!=0;c=*(text++)){
+			if (validbitmapchar(_castPassed,c)){
+				drawBitmapLetterColorAlpha(_castPassed,_passedFont->size,c,_currentDrawTextX,y,r,g,b,a);
+				_currentDrawTextX+=_castPassed->letterInfos[c-_castPassed->firstLetter].imageDisplayWidth*_bitmapFontScaleGet(_castPassed,_passedFont->size);
 			}
 		}
 	}else{
+		EASYFIXCOORDS(&x,&y);
 		#if GBTXT == GBTXT_VITA2D
 			vita2d_font_draw_text(_passedFont->data,x,y+textHeight(_passedFont), RGBA8(r,g,b,a),_passedFont->size,text);
 		#elif GBTXT == GBTXT_FONTCACHE

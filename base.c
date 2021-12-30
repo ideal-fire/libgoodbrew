@@ -26,6 +26,9 @@
 #elif GBPLAT == GB_SWITCH
 	#include <switch.h>
 #endif
+#if __EMSCRIPTEN__
+	#include <emscripten.h>
+#endif
 #if GBREND == GBREND_RAY
 	#include <rayn.h>
 	#define RAYLIBHDTIMERES 10000
@@ -48,7 +51,9 @@ void generalGoodQuit(){
 }
 // Waits for a number of miliseconds.
 void wait(int miliseconds){
-	#if GBPLAT == GB_VITA
+	#if __EMSCRIPTEN__
+		emscripten_sleep(miliseconds);
+	#elif GBPLAT == GB_VITA
 		sceKernelDelayThread(miliseconds*1000);
 	#elif GBREND == GBREND_SDL
 		SDL_Delay(miliseconds);

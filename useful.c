@@ -9,7 +9,6 @@
 
 #define COPYBUFF 16000
 
-
 #if GBPLAT == GB_WINDOWS
 	#define SEPARATOR '\\'
 #else

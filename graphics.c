@@ -22,9 +22,6 @@
 	ALLEGRO_DISPLAY* aDisplay;
 	static ALLEGRO_COLOR _allegroClearColor;
 #endif
-#if __EMSCRIPTEN__
-	#include <emscripten.h>
-#endif
 
 // Used to fix touch coords on Android.
 // Init with dummy values in case used in division
@@ -37,6 +34,9 @@ static int _goodbrewDrawOffY=0;
 static int _goodbrewClearR=0;
 static int _goodbrewClearG=0;
 static int _goodbrewClearB=0;
+
+static u64 _goodbrewFrameStartTime;
+static char capfps=0;
 
 GETTERFUNC(gbGetDrawOffX,int,_goodbrewDrawOffX);
 GETTERFUNC(gbGetDrawOffY,int,_goodbrewDrawOffY);
@@ -85,11 +85,13 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 			_windowHeight=720;
 			SDL_CreateWindowAndRenderer(_windowWidth, _windowHeight, 0, &mainWindow, &mainWindowRenderer);
 		#else
-			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, SDL_WINDOW_SHOWN);			
+			int flags=0;
+			if (_passedFlags & WINDOWFLAG_RESIZABLE){
+				flags|=SDL_WINDOW_RESIZABLE;
+				SDL_SetWindowResizable(mainWindow,SDL_TRUE);
+			}
+			mainWindow = SDL_CreateWindow( "TestWindow", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowWidth, _windowHeight, flags);
 		#endif
-		if (_passedFlags & WINDOWFLAG_RESIZABLE){
-			SDL_SetWindowResizable(mainWindow,SDL_TRUE);
-		}
 		if (mainWindow==NULL){
 			printf("Failed to create window %s\n",SDL_GetError());
 			return;
@@ -102,6 +104,7 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 			mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, _sdlWinFlags);
 			if (mainWindowRenderer==NULL){
 				printf("libgoodbrew: falling back to no vsync\n");
+				capfps=1;
 				mainWindowRenderer = SDL_CreateRenderer( mainWindow, -1, 0);
 				if (mainWindowRenderer==NULL){
 					printf("failed to create renderer\n");
@@ -111,6 +114,9 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 		}
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 		SDL_SetRenderDrawBlendMode(mainWindowRenderer,SDL_BLENDMODE_BLEND);
+		#if __EMSCRIPTEN__
+		capfps=1;
+		#endif
 		/*#if GBPLAT == GB_WINDOWS || GBPLAT == GB_LINUX
 			// Set a solid white icon.
 			SDL_Surface* tempIconSurface;
@@ -162,25 +168,19 @@ void initGraphics(int _windowWidth, int _windowHeight, long _passedFlags){
 	_goodbrewRealScreenWidth = _windowWidth;
 	_goodbrewRealScreenHeight = _windowHeight;
 }
-#if CAPHUGEFPS == 1 || __EMSCRIPTEN__
-	static u64 _goodbrewFrameStartTime;
-#endif
 void startDrawing(){
 	#if GBREND == GBREND_VITA2D
 		vita2d_start_drawing();
 		vita2d_clear_screen();
 	#elif GBREND == GBREND_SDL
 		SDL_RenderClear(mainWindowRenderer);
-		#if CAPHUGEFPS == 1 || __EMSCRIPTEN__
-			_goodbrewFrameStartTime = getMilli();
-		#endif
+		_goodbrewFrameStartTime = getMilli();
 	#elif GBREND == GBREND_SF2D
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	#elif GBREND == GBREND_QUICK
 		al_clear_to_color(_allegroClearColor);
 	#endif
 }
-
 void endDrawing(){
 	#if GBREND == GBREND_VITA2D
 		vita2d_end_drawing();
@@ -188,17 +188,19 @@ void endDrawing(){
 		vita2d_wait_rendering_done();
 	#elif GBREND == GBREND_SDL
 		SDL_RenderPresent(mainWindowRenderer);
-		// this is the only one that may not limit to 60 fps
-		#if __EMSCRIPTEN__
+		if (capfps){
 			int _rest = 16-(getMilli()-_goodbrewFrameStartTime);
 			if (_rest>=0){
-				emscripten_sleep(_rest);
+				wait(_rest);
 			}
-		#elif CAPHUGEFPS == 1
+		}
+		#if CAPHUGEFPS == 1
+		else{
 			if (getMilli()-_goodbrewFrameStartTime==0){
 				wait(1);
 			}
-		#endif	
+		}
+		#endif
 	#elif GBREND == GBREND_SF2D
 		sf2d_end_frame();
 		sf2d_swapbuffers();
