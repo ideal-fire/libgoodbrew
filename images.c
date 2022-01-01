@@ -36,7 +36,7 @@
 		SDL_SetTextureBlendMode(_returnTexture, SDL_BLENDMODE_BLEND); // Allow the texture to be drawn translucent
 		return _returnTexture;
 	}
-void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint, double _angle, SDL_Point* rotatecenter, SDL_RendererFlip f){
+void SDLDrawShared(SDL_Texture* passedTexture, float destX, float destY, int destW, int destH, int partX, int partY, int partW, int partH, unsigned char r, unsigned char g, unsigned b, unsigned char a, char _doAlpha, char _doTint, double _angle, SDL_FPoint* rotatecenter, SDL_RendererFlip f){
 		unsigned char oldr;
 		unsigned char oldg;
 		unsigned char oldb;
@@ -51,7 +51,7 @@ void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, 
 		}
 		////
 		SDL_Rect _srcRect;
-		SDL_Rect _destRect;
+		SDL_FRect _destRect;
 		if (partX==-1){
 			SDL_QueryTexture(passedTexture, NULL, NULL, &(_srcRect.w), &(_srcRect.h));
 			_srcRect.x=0;
@@ -74,7 +74,7 @@ void SDLDrawShared(SDL_Texture* passedTexture, int destX, int destY, int destW, 
 		_destRect.x=destX;
 		_destRect.y=destY;
 
-		SDL_RenderCopyEx(mainWindowRenderer, passedTexture, &_srcRect, &_destRect,_angle, rotatecenter, f);
+		SDL_RenderCopyExF(mainWindowRenderer, passedTexture, &_srcRect, &_destRect,_angle, rotatecenter, f);
 		////
 		if (_doTint){
 			SDL_SetTextureColorMod(passedTexture, oldr, oldg, oldb);
@@ -399,7 +399,7 @@ void drawTextureSizedTintAlphaRotate00(crossTexture* passedTexture, float destX,
 			f|=SDL_FLIP_VERTICAL;
 		}
 		double as_degrees=(angle/(3.14159*2))*360;
-		SDL_Point p;
+		SDL_FPoint p;
 		p.x=0;
 		p.y=0;
 		SDLDrawShared(passedTexture,destX,destY,destW,destH,-1,-1,-1,-1,r,g,b,a,1,1,as_degrees,&p,f);
